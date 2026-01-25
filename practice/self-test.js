@@ -146,6 +146,11 @@ function parseArr(str) {
 
 // - 封装 indexOf
 // - 16 进制转 10 进制
+// - 数组扁平化
+// - 对象扁平化
+// - 深比较
+// - URL 参数解析 / 序列化
+// - 数组去重
 //
 // JS 语言基础手写
 // - instanceof 手写
@@ -166,6 +171,10 @@ function myInstanceof(obj, constructor) {
 
 // - 手写 new
 // - 柯里化
+// - 柯里化（可变参数）
+// - 函数组合（compose / pipe）
+// - 函数记忆（memoize）
+// - 函数只执行一次（once）
 // - 深拷贝（处理循环引用）
 //
 // 异步与 Promise 控制
@@ -266,6 +275,7 @@ function limitPromise(tasks, limit) {
   });
 }
 // - Promise 队列 + 并发控制
+// - Promise 串行执行器（调用一次执行一次）
 
 //
 // 数据结构设计题
@@ -954,6 +964,7 @@ function levelGoTree(root) {
 }
 
 // - 二叉树最近公共祖先
+
 // - 对象 DFS/BFS、多叉树层序
 // - 二叉树右视图 / 锯齿层序（补充自 33-answers.js）
 // - 二叉树序列化 / 反序列化（层序，补充自 33-answers.js）
@@ -963,6 +974,11 @@ function levelGoTree(root) {
 // - 路径总和
 // - 在树里寻找 target 值的路径
 // - 在树里寻找 target 值的路径（路径数量）
+// - 对称二叉树
+// - 平衡二叉树
+// - 二叉树最小深度
+// - 二叉树直径
+// - 从前序与中序构建二叉树
 //
 // 图 / 并查集
 // - 并查集 + 岛屿数量

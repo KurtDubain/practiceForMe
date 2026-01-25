@@ -15,11 +15,20 @@
     - [自定义数组解析（简化版）](#自定义数组解析简化版)
     - [封装 indexOf](#封装-indexof)
     - [16 进制转 10 进制](#16-进制转-10-进制)
+    - [数组扁平化](#数组扁平化)
+    - [对象扁平化](#对象扁平化)
+    - [深比较](#深比较)
+    - [URL 参数解析 / 序列化](#url-参数解析--序列化)
+    - [数组去重](#数组去重)
   - [JS 语言基础手写](#js-语言基础手写)
     - [instanceof 手写](#instanceof-手写)
     - [call / apply / bind](#call--apply--bind)
     - [手写 new](#手写-new)
     - [柯里化](#柯里化)
+    - [柯里化（可变参数）](#柯里化可变参数)
+    - [函数组合（compose / pipe）](#函数组合compose--pipe)
+    - [函数记忆（memoize）](#函数记忆memoize)
+    - [函数只执行一次（once）](#函数只执行一次once)
     - [深拷贝（处理循环引用）](#深拷贝处理循环引用)
   - [异步与 Promise 控制](#异步与-promise-控制)
     - [Promise.all 手写](#promiseall-手写)
@@ -27,6 +36,7 @@
     - [Promise 的递归调用（顺序执行任务）](#promise-的递归调用顺序执行任务)
     - [Promise 并发限制](#promise-并发限制)
     - [Promise 队列 + 并发控制](#promise-队列--并发控制)
+    - [Promise 串行执行器（调用一次执行一次）](#promise-串行执行器调用一次执行一次)
   - [数据结构设计题](#数据结构设计题)
     - [LRUCache](#lrucache)
     - [RandomizedSet（补充自 33-answers.js）](#randomizedset补充自-33-answersjs)
@@ -85,6 +95,7 @@
     - [二叉树遍历（前/中/后/层序）](#二叉树遍历前中后层序)
     - [二叉树最近公共祖先](#二叉树最近公共祖先)
     - [对象 DFS/BFS、多叉树层序](#对象-dfsbfs多叉树层序)
+    - [二叉树右视图 / 锯齿层序（补充自 33-answers.js）](#二叉树右视图--锯齿层序补充自-33-answersjs)
     - [二叉树序列化 / 反序列化（层序，补充自 33-answers.js）](#二叉树序列化--反序列化层序补充自-33-answersjs)
     - [二叉树最大深度](#二叉树最大深度)
     - [验证二叉搜索树](#验证二叉搜索树)
@@ -92,6 +103,14 @@
     - [路径总和](#路径总和)
     - [在树里寻找 target 值的路径](#在树里寻找-target-值的路径)
     - [在树里寻找 target 值的路径（路径数量）](#在树里寻找-target-值的路径路径数量)
+    - [对称二叉树](#对称二叉树)
+    - [平衡二叉树](#平衡二叉树)
+    - [二叉树最小深度](#二叉树最小深度)
+    - [二叉树直径](#二叉树直径)
+    - [从前序与中序构建二叉树](#从前序与中序构建二叉树)
+  - [图 / 并查集](#图--并查集)
+    - [并查集 + 岛屿数量](#并查集--岛屿数量)
+    - [课程表（拓扑排序，补充自 33-answers.js）](#课程表拓扑排序补充自-33-answersjs)
     - [课程表 II（拓扑排序输出）](#课程表-ii拓扑排序输出)
     - [腐烂的橘子](#腐烂的橘子)
     - [省份数量](#省份数量)
@@ -316,6 +335,104 @@ function Ch16To10(str) {
 }
 ```
 
+<a id="flattenarray"></a>
+### 数组扁平化
+```js
+function flattenArray(arr, depth = Infinity) {
+  const result = [];
+  (function flat(current, d) {
+    for (const item of current) {
+      if (Array.isArray(item) && d > 0) {
+        flat(item, d - 1);
+      } else {
+        result.push(item);
+      }
+    }
+  })(arr, depth);
+  return result;
+}
+```
+
+<a id="flattenobject"></a>
+### 对象扁平化
+```js
+function flattenObject(obj, prefix = "") {
+  const result = {};
+  for (const [key, value] of Object.entries(obj)) {
+    const path = prefix ? `${prefix}.${key}` : key;
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      Object.assign(result, flattenObject(value, path));
+    } else {
+      result[path] = value;
+    }
+  }
+  return result;
+}
+```
+
+<a id="deepequal"></a>
+### 深比较
+```js
+function deepEqual(a, b) {
+  if (Object.is(a, b)) return true;
+  if (typeof a !== typeof b) return false;
+  if (a && b && typeof a === "object") {
+    if (Array.isArray(a) !== Array.isArray(b)) return false;
+    const aKeys = Object.keys(a);
+    const bKeys = Object.keys(b);
+    if (aKeys.length !== bKeys.length) return false;
+    for (const key of aKeys) {
+      if (!deepEqual(a[key], b[key])) return false;
+    }
+    return true;
+  }
+  return false;
+}
+```
+
+<a id="querystring"></a>
+### URL 参数解析 / 序列化
+```js
+function parseQuery(query) {
+  const q = query.startsWith("?") ? query.slice(1) : query;
+  const result = {};
+  if (!q) return result;
+  for (const part of q.split("&")) {
+    if (!part) continue;
+    const [key, value = ""] = part.split("=");
+    const k = decodeURIComponent(key);
+    const v = decodeURIComponent(value);
+    if (result[k] === undefined) result[k] = v;
+    else if (Array.isArray(result[k])) result[k].push(v);
+    else result[k] = [result[k], v];
+  }
+  return result;
+}
+
+function stringifyQuery(obj) {
+  const parts = [];
+  for (const [key, value] of Object.entries(obj)) {
+    const k = encodeURIComponent(key);
+    if (Array.isArray(value)) {
+      value.forEach((v) => parts.push(`${k}=${encodeURIComponent(String(v))}`));
+    } else if (value != null) {
+      parts.push(`${k}=${encodeURIComponent(String(value))}`);
+    } else {
+      parts.push(`${k}=`);
+    }
+  }
+  return parts.length ? `?${parts.join("&")}` : "";
+}
+```
+
+<a id="uniquearray"></a>
+### 数组去重
+```js
+function uniqueArray(arr) {
+  return Array.from(new Set(arr));
+}
+```
+
 [⬆ 返回目录](#目录)
 
 ## JS 语言基础手写
@@ -389,6 +506,67 @@ function curry(func) {
         return curried.apply(this, args.concat(newArgs));
       };
     }
+  };
+}
+```
+
+<a id="currysum"></a>
+### 柯里化（可变参数）
+```js
+function currySum(...args) {
+  let total = args.reduce((sum, val) => sum + val, 0);
+  function next(...more) {
+    if (more.length === 0) return total;
+    total += more.reduce((sum, val) => sum + val, 0);
+    return next;
+  }
+  return next;
+}
+```
+
+<a id="composepipe"></a>
+### 函数组合（compose / pipe）
+```js
+function compose(...fns) {
+  return function (input) {
+    return fns.reduceRight((acc, fn) => fn(acc), input);
+  };
+}
+
+function pipe(...fns) {
+  return function (input) {
+    return fns.reduce((acc, fn) => fn(acc), input);
+  };
+}
+```
+
+<a id="memoize"></a>
+### 函数记忆（memoize）
+```js
+function memoize(fn) {
+  const cache = new Map();
+  return function (...args) {
+    const key = JSON.stringify(args);
+    if (cache.has(key)) return cache.get(key);
+    const result = fn.apply(this, args);
+    cache.set(key, result);
+    return result;
+  };
+}
+```
+
+<a id="once"></a>
+### 函数只执行一次（once）
+```js
+function once(fn) {
+  let called = false;
+  let result;
+  return function (...args) {
+    if (!called) {
+      called = true;
+      result = fn.apply(this, args);
+    }
+    return result;
   };
 }
 ```
@@ -571,6 +749,18 @@ function promiseQueue(tasks, maxConcurrent) {
     }
     runTask();
   });
+}
+```
+
+<a id="serialexecutor"></a>
+### Promise 串行执行器（调用一次执行一次）
+```js
+function createSerialExecutor() {
+  let last = Promise.resolve();
+  return function run(task) {
+    last = last.then(() => task(), () => task());
+    return last;
+  };
 }
 ```
 
@@ -2169,6 +2359,87 @@ function pathSumCount(root, targetSum) {
 }
 ```
 
+<a id="issymmetric"></a>
+### 对称二叉树
+```js
+function isSymmetric(root) {
+  function isMirror(a, b) {
+    if (!a && !b) return true;
+    if (!a || !b) return false;
+    if (a.val !== b.val) return false;
+    return isMirror(a.left, b.right) && isMirror(a.right, b.left);
+  }
+  return isMirror(root, root);
+}
+```
+
+<a id="isbalanced"></a>
+### 平衡二叉树
+```js
+function isBalanced(root) {
+  function height(node) {
+    if (!node) return 0;
+    const left = height(node.left);
+    if (left === -1) return -1;
+    const right = height(node.right);
+    if (right === -1) return -1;
+    if (Math.abs(left - right) > 1) return -1;
+    return Math.max(left, right) + 1;
+  }
+  return height(root) !== -1;
+}
+```
+
+<a id="mindepth"></a>
+### 二叉树最小深度
+```js
+function minDepth(root) {
+  if (!root) return 0;
+  if (!root.left && !root.right) return 1;
+  if (!root.left) return minDepth(root.right) + 1;
+  if (!root.right) return minDepth(root.left) + 1;
+  return Math.min(minDepth(root.left), minDepth(root.right)) + 1;
+}
+```
+
+<a id="diameter"></a>
+### 二叉树直径
+```js
+function diameterOfBinaryTree(root) {
+  let max = 0;
+  function depth(node) {
+    if (!node) return 0;
+    const left = depth(node.left);
+    const right = depth(node.right);
+    max = Math.max(max, left + right);
+    return Math.max(left, right) + 1;
+  }
+  depth(root);
+  return max;
+}
+```
+
+<a id="buildtreeprein"></a>
+### 从前序与中序构建二叉树
+```js
+function buildTreeFromPreIn(preorder, inorder) {
+  if (!preorder || preorder.length === 0) return null;
+  const indexMap = new Map();
+  for (let i = 0; i < inorder.length; i++) {
+    indexMap.set(inorder[i], i);
+  }
+  let preIndex = 0;
+  function helper(left, right) {
+    if (left > right) return null;
+    const rootVal = preorder[preIndex++];
+    const root = new TreeNode(rootVal);
+    const mid = indexMap.get(rootVal);
+    root.left = helper(left, mid - 1);
+    root.right = helper(mid + 1, right);
+    return root;
+  }
+  return helper(0, inorder.length - 1);
+}
 ```
 
 [⬆ 返回目录](#目录)
