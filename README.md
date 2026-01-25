@@ -31,6 +31,10 @@
     - [LRUCache](#lrucache)
     - [RandomizedSet（补充自 33-answers.js）](#randomizedset补充自-33-answersjs)
     - [LFUCache（补充自 33-answers.js）](#lfucache补充自-33-answersjs)
+    - [MinStack](#minstack)
+    - [用栈实现队列](#用栈实现队列)
+    - [用队列实现栈](#用队列实现栈)
+    - [前缀树 Trie](#前缀树-trie)
   - [数组 / 字符串 / 双指针](#数组--字符串--双指针)
     - [大数相加](#大数相加)
     - [Two Sum（返回数对）](#two-sum返回数对)
@@ -48,6 +52,13 @@
     - [括号闭合](#括号闭合)
     - [KMP 字符串匹配](#kmp-字符串匹配)
     - [前 K 大（小顶堆）](#前-k-大小顶堆)
+    - [移动零](#移动零)
+    - [盛最多水](#盛最多水)
+    - [最长公共前缀](#最长公共前缀)
+    - [合并两个有序数组](#合并两个有序数组)
+    - [旋转数组](#旋转数组)
+    - [滑动窗口最大值](#滑动窗口最大值)
+    - [字母异位词分组](#字母异位词分组)
   - [排序](#排序)
     - [快速排序](#快速排序)
     - [归并排序](#归并排序)
@@ -57,17 +68,33 @@
     - [打家劫舍](#打家劫舍)
     - [最长上升子序列（O(n^2)）](#最长上升子序列on2)
     - [编辑距离](#编辑距离)
+    - [最大子数组和](#最大子数组和)
+    - [不同路径](#不同路径)
+    - [最长公共子序列](#最长公共子序列)
   - [链表](#链表)
     - [反转链表](#反转链表)
     - [合并两个有序链表](#合并两个有序链表)
     - [回文链表](#回文链表)
     - [K 个一组反转链表（补充自 33-answers.js）](#k-个一组反转链表补充自-33-answersjs)
+    - [环形链表](#环形链表)
+    - [删除倒数第 N 个节点](#删除倒数第-n-个节点)
+    - [相交链表](#相交链表)
+    - [两数相加](#两数相加)
   - [树](#树)
     - [翻转二叉树](#翻转二叉树)
     - [二叉树遍历（前/中/后/层序）](#二叉树遍历前中后层序)
     - [二叉树最近公共祖先](#二叉树最近公共祖先)
     - [对象 DFS/BFS、多叉树层序](#对象-dfsbfs多叉树层序)
     - [二叉树序列化 / 反序列化（层序，补充自 33-answers.js）](#二叉树序列化--反序列化层序补充自-33-answersjs)
+    - [二叉树最大深度](#二叉树最大深度)
+    - [验证二叉搜索树](#验证二叉搜索树)
+    - [二叉搜索树中第 K 小的元素](#二叉搜索树中第-k-小的元素)
+    - [路径总和](#路径总和)
+    - [在树里寻找 target 值的路径](#在树里寻找-target-值的路径)
+    - [在树里寻找 target 值的路径（路径数量）](#在树里寻找-target-值的路径路径数量)
+    - [课程表 II（拓扑排序输出）](#课程表-ii拓扑排序输出)
+    - [腐烂的橘子](#腐烂的橘子)
+    - [省份数量](#省份数量)
 
 ---
 
@@ -660,6 +687,152 @@ class LFUCache {
 }
 ```
 
+<a id="minstack"></a>
+### MinStack
+```js
+class MinStack {
+  constructor() {
+    this.stack = [];
+    this.minStack = [];
+  }
+
+  push(x) {
+    this.stack.push(x);
+    const min =
+      this.minStack.length === 0 ? x : this.minStack[this.minStack.length - 1];
+    this.minStack.push(x < min ? x : min);
+  }
+
+  pop() {
+    if (this.stack.length === 0) return null;
+    this.minStack.pop();
+    return this.stack.pop();
+  }
+
+  top() {
+    if (this.stack.length === 0) return null;
+    return this.stack[this.stack.length - 1];
+  }
+
+  getMin() {
+    if (this.minStack.length === 0) return null;
+    return this.minStack[this.minStack.length - 1];
+  }
+}
+```
+
+<a id="myqueue"></a>
+### 用栈实现队列
+```js
+class MyQueue {
+  constructor() {
+    this.inStack = [];
+    this.outStack = [];
+  }
+
+  push(x) {
+    this.inStack.push(x);
+  }
+
+  move() {
+    if (this.outStack.length === 0) {
+      while (this.inStack.length > 0) {
+        this.outStack.push(this.inStack.pop());
+      }
+    }
+  }
+
+  pop() {
+    this.move();
+    return this.outStack.pop();
+  }
+
+  peek() {
+    this.move();
+    return this.outStack[this.outStack.length - 1];
+  }
+
+  empty() {
+    return this.inStack.length === 0 && this.outStack.length === 0;
+  }
+}
+```
+
+<a id="mystack"></a>
+### 用队列实现栈
+```js
+class MyStack {
+  constructor() {
+    this.queue = [];
+  }
+
+  push(x) {
+    this.queue.push(x);
+    for (let i = 0; i < this.queue.length - 1; i++) {
+      this.queue.push(this.queue.shift());
+    }
+  }
+
+  pop() {
+    return this.queue.shift();
+  }
+
+  top() {
+    return this.queue[0];
+  }
+
+  empty() {
+    return this.queue.length === 0;
+  }
+}
+```
+
+<a id="trie"></a>
+### 前缀树 Trie
+```js
+class TrieNode {
+  constructor() {
+    this.children = new Map();
+    this.isEnd = false;
+  }
+}
+
+class Trie {
+  constructor() {
+    this.root = new TrieNode();
+  }
+
+  insert(word) {
+    let node = this.root;
+    for (const ch of word) {
+      if (!node.children.has(ch)) {
+        node.children.set(ch, new TrieNode());
+      }
+      node = node.children.get(ch);
+    }
+    node.isEnd = true;
+  }
+
+  search(word) {
+    let node = this.root;
+    for (const ch of word) {
+      if (!node.children.has(ch)) return false;
+      node = node.children.get(ch);
+    }
+    return node.isEnd;
+  }
+
+  startsWith(prefix) {
+    let node = this.root;
+    for (const ch of prefix) {
+      if (!node.children.has(ch)) return false;
+      node = node.children.get(ch);
+    }
+    return true;
+  }
+}
+```
+
 [⬆ 返回目录](#目录)
 
 ## 数组 / 字符串 / 双指针
@@ -951,22 +1124,30 @@ function diagonalTraverse(matrix) {
 <a id="permute"></a>
 ### 全排列
 ```js
-function permute(nums) {
+function permuteUnique(nums) {
   const result = [];
+
   function backtrack(start) {
     if (start === nums.length) {
       result.push([...nums]);
       return;
     }
+
+    const used = new Set(); // 这一层 start 位置已经尝试过的值
     for (let i = start; i < nums.length; i++) {
+      if (used.has(nums[i])) continue; // 同层去重：同一个值只放一次到 start
+      used.add(nums[i]);
+
       [nums[start], nums[i]] = [nums[i], nums[start]];
       backtrack(start + 1);
       [nums[start], nums[i]] = [nums[i], nums[start]];
     }
   }
+
   backtrack(0);
   return result;
 }
+
 ```
 
 <a id="arraytotree"></a>
@@ -1106,6 +1287,135 @@ function topKLargest(nums, k) {
     if (heap.length > k) heapPop(heap);
   }
   return heap.sort((a, b) => b - a);
+}
+```
+
+<a id="movezeroes"></a>
+### 移动零
+```js
+function moveZeroes(nums) {
+  let insert = 0;
+  for (let i = 0; i < nums.length; i++) {
+    if (nums[i] !== 0) {
+      nums[insert] = nums[i];
+      insert++;
+    }
+  }
+  while (insert < nums.length) {
+    nums[insert] = 0;
+    insert++;
+  }
+  return nums;
+}
+```
+
+<a id="maxarea"></a>
+### 盛最多水
+```js
+function maxArea(height) {
+  let left = 0;
+  let right = height.length - 1;
+  let best = 0;
+  while (left < right) {
+    const h = Math.min(height[left], height[right]);
+    best = Math.max(best, h * (right - left));
+    if (height[left] < height[right]) left++;
+    else right--;
+  }
+  return best;
+}
+```
+
+<a id="longestcommonprefix"></a>
+### 最长公共前缀
+```js
+function longestCommonPrefix(strs) {
+  if (!strs || strs.length === 0) return "";
+  let prefix = strs[0];
+  for (let i = 1; i < strs.length; i++) {
+    while (strs[i].indexOf(prefix) !== 0) {
+      prefix = prefix.slice(0, -1);
+      if (prefix === "") return "";
+    }
+  }
+  return prefix;
+}
+```
+
+<a id="mergesortedarray"></a>
+### 合并两个有序数组
+```js
+function mergeSortedArrays(nums1, m, nums2, n) {
+  let i = m - 1;
+  let j = n - 1;
+  let k = m + n - 1;
+  while (j >= 0) {
+    if (i >= 0 && nums1[i] > nums2[j]) {
+      nums1[k--] = nums1[i--];
+    } else {
+      nums1[k--] = nums2[j--];
+    }
+  }
+  return nums1;
+}
+```
+
+<a id="rotatearray"></a>
+### 旋转数组
+```js
+function rotateArray(nums, k) {
+  const n = nums.length;
+  if (n === 0) return nums;
+  k = k % n;
+  reverse(nums, 0, n - 1);
+  reverse(nums, 0, k - 1);
+  reverse(nums, k, n - 1);
+  return nums;
+}
+
+function reverse(arr, i, j) {
+  while (i < j) {
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+    i++;
+    j--;
+  }
+}
+```
+
+<a id="maxslidingwindow"></a>
+### 滑动窗口最大值
+```js
+function maxSlidingWindow(nums, k) {
+  if (k <= 0) return [];
+  const deque = [];
+  const result = [];
+  for (let i = 0; i < nums.length; i++) {
+    while (deque.length && deque[0] <= i - k) {
+      deque.shift();
+    }
+    while (deque.length && nums[deque[deque.length - 1]] <= nums[i]) {
+      deque.pop();
+    }
+    deque.push(i);
+    if (i >= k - 1) {
+      result.push(nums[deque[0]]);
+    }
+  }
+  return result;
+}
+```
+
+<a id="groupanagrams"></a>
+### 字母异位词分组
+```js
+function groupAnagrams(strs) {
+  const map = new Map();
+  for (const str of strs) {
+    const key = str.split("").sort().join("");
+    if (!map.has(key)) map.set(key, []);
+    map.get(key).push(str);
+  }
+  return Array.from(map.values());
 }
 ```
 
@@ -1275,6 +1585,56 @@ function editDistance(word1, word2) {
 }
 ```
 
+<a id="maxsubarray"></a>
+### 最大子数组和
+```js
+function maxSubArray(nums) {
+  let cur = nums[0];
+  let best = nums[0];
+  for (let i = 1; i < nums.length; i++) {
+    cur = Math.max(nums[i], cur + nums[i]);
+    best = Math.max(best, cur);
+  }
+  return best;
+}
+```
+
+<a id="uniquepaths"></a>
+### 不同路径
+```js
+function uniquePaths(m, n) {
+  const dp = new Array(n).fill(1);
+  for (let i = 1; i < m; i++) {
+    for (let j = 1; j < n; j++) {
+      dp[j] += dp[j - 1];
+    }
+  }
+  return dp[n - 1];
+}
+```
+
+<a id="lcs"></a>
+### 最长公共子序列
+```js
+function longestCommonSubsequence(text1, text2) {
+  const m = text1.length;
+  const n = text2.length;
+  const dp = Array.from({ length: m + 1 }, () =>
+    new Array(n + 1).fill(0)
+  );
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (text1[i - 1] === text2[j - 1]) {
+        dp[i][j] = dp[i - 1][j - 1] + 1;
+      } else {
+        dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+      }
+    }
+  }
+  return dp[m][n];
+}
+```
+
 [⬆ 返回目录](#目录)
 
 ## 链表
@@ -1394,6 +1754,77 @@ function reverseKGroup(head, k) {
     const tmp = groupPrev.next;
     groupPrev.next = prev;
     groupPrev = tmp;
+  }
+  return dummy.next;
+}
+```
+
+<a id="hascycle"></a>
+### 环形链表
+```js
+function hasCycle(head) {
+  let slow = head;
+  let fast = head;
+  while (fast && fast.next) {
+    slow = slow.next;
+    fast = fast.next.next;
+    if (slow === fast) return true;
+  }
+  return false;
+}
+```
+
+<a id="removenth"></a>
+### 删除倒数第 N 个节点
+```js
+function removeNthFromEnd(head, n) {
+  const dummy = { val: 0, next: head };
+  let fast = dummy;
+  let slow = dummy;
+  for (let i = 0; i < n; i++) {
+    fast = fast.next;
+  }
+  while (fast && fast.next) {
+    fast = fast.next;
+    slow = slow.next;
+  }
+  if (slow.next) slow.next = slow.next.next;
+  return dummy.next;
+}
+```
+
+<a id="intersectionnode"></a>
+### 相交链表
+```js
+function getIntersectionNode(headA, headB) {
+  let p1 = headA;
+  let p2 = headB;
+  while (p1 !== p2) {
+    p1 = p1 ? p1.next : headB;
+    p2 = p2 ? p2.next : headA;
+  }
+  return p1;
+}
+```
+
+<a id="addtwonumbers"></a>
+### 两数相加
+```js
+function addTwoNumbers(l1, l2) {
+  const dummy = { val: 0, next: null };
+  let cur = dummy;
+  let carry = 0;
+  let p1 = l1;
+  let p2 = l2;
+  while (p1 || p2 || carry) {
+    const x = p1 ? p1.val : 0;
+    const y = p2 ? p2.val : 0;
+    const sum = x + y + carry;
+    carry = Math.floor(sum / 10);
+    cur.next = { val: sum % 10, next: null };
+    cur = cur.next;
+    p1 = p1 ? p1.next : null;
+    p2 = p2 ? p2.next : null;
   }
   return dummy.next;
 }
@@ -1638,6 +2069,106 @@ function deserialize(data) {
   return root;
 }
 ```
+
+<a id="maxdepth"></a>
+### 二叉树最大深度
+```js
+function maxDepth(root) {
+  if (!root) return 0;
+  return Math.max(maxDepth(root.left), maxDepth(root.right)) + 1;
+}
+```
+
+<a id="isvalidbst"></a>
+### 验证二叉搜索树
+```js
+function isValidBST(root) {
+  function helper(node, min, max) {
+    if (!node) return true;
+    if (node.val <= min || node.val >= max) return false;
+    return helper(node.left, min, node.val) && helper(node.right, node.val, max);
+  }
+  return helper(root, -Infinity, Infinity);
+}
+```
+
+<a id="kthsmallest"></a>
+### 二叉搜索树中第 K 小的元素
+```js
+function kthSmallest(root, k) {
+  const stack = [];
+  let cur = root;
+  let count = 0;
+  while (cur || stack.length) {
+    while (cur) {
+      stack.push(cur);
+      cur = cur.left;
+    }
+    cur = stack.pop();
+    count++;
+    if (count === k) return cur.val;
+    cur = cur.right;
+  }
+  return null;
+}
+```
+
+<a id="haspathsum"></a>
+### 路径总和
+```js
+function hasPathSum(root, targetSum) {
+  if (!root) return false;
+  if (!root.left && !root.right) return root.val === targetSum;
+  const next = targetSum - root.val;
+  return hasPathSum(root.left, next) || hasPathSum(root.right, next);
+}
+```
+
+<a id="pathsumall"></a>
+### 在树里寻找 target 值的路径
+```js
+function pathSumAll(root, targetSum) {
+  const result = [];
+  const path = [];
+  function dfs(node, sum) {
+    if (!node) return;
+    path.push(node.val);
+    const next = sum - node.val;
+    if (!node.left && !node.right) {
+      if (next === 0) result.push([...path]);
+    } else {
+      dfs(node.left, next);
+      dfs(node.right, next);
+    }
+    path.pop();
+  }
+  dfs(root, targetSum);
+  return result;
+}
+```
+
+<a id="pathsumcount"></a>
+### 在树里寻找 target 值的路径（路径数量）
+```js
+function pathSumCount(root, targetSum) {
+  const prefix = new Map();
+  prefix.set(0, 1);
+  let count = 0;
+  function dfs(node, sum) {
+    if (!node) return;
+    const cur = sum + node.val;
+    const need = cur - targetSum;
+    if (prefix.has(need)) count += prefix.get(need);
+    prefix.set(cur, (prefix.get(cur) || 0) + 1);
+    dfs(node.left, cur);
+    dfs(node.right, cur);
+    prefix.set(cur, prefix.get(cur) - 1);
+  }
+  dfs(root, 0);
+  return count;
+}
+```
+
 ```
 
 [⬆ 返回目录](#目录)
@@ -1728,6 +2259,95 @@ function canFinish(numCourses, prerequisites) {
   return visited === numCourses;
 }
 ```
+
+<a id="findorder"></a>
+### 课程表 II（拓扑排序输出）
+```js
+function findOrder(numCourses, prerequisites) {
+  const indeg = new Array(numCourses).fill(0);
+  const g = Array.from({ length: numCourses }, () => []);
+  for (const [a, b] of prerequisites) {
+    g[b].push(a);
+    indeg[a]++;
+  }
+  const queue = [];
+  for (let i = 0; i < numCourses; i++) if (indeg[i] === 0) queue.push(i);
+  const order = [];
+  for (let i = 0; i < queue.length; i++) {
+    const u = queue[i];
+    order.push(u);
+    for (const v of g[u]) {
+      if (--indeg[v] === 0) queue.push(v);
+    }
+  }
+  return order.length === numCourses ? order : [];
+}
+```
+
+<a id="orangesrotting"></a>
+### 腐烂的橘子
+```js
+function orangesRotting(grid) {
+  const rows = grid.length;
+  const cols = grid[0].length;
+  const queue = [];
+  let fresh = 0;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (grid[r][c] === 2) queue.push([r, c]);
+      else if (grid[r][c] === 1) fresh++;
+    }
+  }
+  let minutes = 0;
+  const dirs = [
+    [1, 0],
+    [-1, 0],
+    [0, 1],
+    [0, -1],
+  ];
+  while (queue.length && fresh > 0) {
+    const size = queue.length;
+    for (let i = 0; i < size; i++) {
+      const [r, c] = queue.shift();
+      for (const [dr, dc] of dirs) {
+        const nr = r + dr;
+        const nc = c + dc;
+        if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
+        if (grid[nr][nc] !== 1) continue;
+        grid[nr][nc] = 2;
+        fresh--;
+        queue.push([nr, nc]);
+      }
+    }
+    minutes++;
+  }
+  return fresh === 0 ? minutes : -1;
+}
+```
+
+<a id="provinces"></a>
+### 省份数量
+```js
+function findCircleNum(isConnected) {
+  const n = isConnected.length;
+  const visited = new Array(n).fill(false);
+  let count = 0;
+  function dfs(i) {
+    visited[i] = true;
+    for (let j = 0; j < n; j++) {
+      if (isConnected[i][j] === 1 && !visited[j]) dfs(j);
+    }
+  }
+  for (let i = 0; i < n; i++) {
+    if (!visited[i]) {
+      count++;
+      dfs(i);
+    }
+  }
+  return count;
+}
+```
+
 ```
 
 [⬆ 返回目录](#目录)
