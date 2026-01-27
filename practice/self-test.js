@@ -151,6 +151,8 @@ function parseArr(str) {
 // - 深比较
 // - URL 参数解析 / 序列化
 // - 数组去重
+// - 深度合并（deepMerge）
+// - 对象路径取值与赋值
 //
 // JS 语言基础手写
 // - instanceof 手写
@@ -276,6 +278,24 @@ function limitPromise(tasks, limit) {
 }
 // - Promise 队列 + 并发控制
 // - Promise 串行执行器（调用一次执行一次）
+function createExecutor() {
+  let last = Promise.resolve();
+  return function run(task) {
+    last = last.then(
+      () => {
+        task();
+      },
+      () => {
+        task();
+      },
+    );
+    return last;
+  };
+}
+// - Promise.race 手写
+// - Promise.allSettled 手写
+// - Promise.any 手写
+// - Promise 超时包装（timeout）
 
 //
 // 数据结构设计题
@@ -715,6 +735,57 @@ function groupAna(strs) {
   }
   return Array.from(map.values());
 }
+// - 和为 K 的子数组
+function subarraySum(nums, k) {
+  const map = new Map();
+  map.set(0, 1);
+  let sum = 0;
+  let count = 0;
+  for (const x of nums) {
+    sum += x;
+    const need = sum - k;
+    if (map.has(need)) count += map.get(need);
+    map.set(sum, (map.get(sum) || 0) + 1);
+  }
+  return count;
+}
+// - 最长连续序列
+function longestARRR(nums) {
+  const set = new Set(nums);
+  let best = 0;
+  for (const x of set) {
+    if (set.has(x - 1)) continue;
+    let cur = x;
+    let len = 1;
+    while (set.has(cur + 1)) {
+      cur++;
+      len++;
+    }
+    best = Math.max(best, len);
+  }
+  return best;
+}
+// - 除自身以外数组的乘积
+// - 前 K 个高频元素
+// - 买卖股票的最佳时机
+function maxProfit(prices) {
+  let minPrice = Infinity;
+  let best = 0;
+  for (const p of prices) {
+    minPrice = Math.min(minPrice, p);
+    best = Math.max(best, p - minPrice);
+  }
+  return best;
+}
+// - 跳跃游戏
+// - 子集
+// - 组合总和
+// - 括号生成
+// - 每日温度（单调栈）
+// - 柱状图中最大的矩形（单调栈）
+// - 搜索插入位置
+// - 搜索范围（左右边界二分）
+// - 寻找旋转排序数组中的最小值
 //
 // 排序
 // - 快速排序
@@ -964,20 +1035,269 @@ function levelGoTree(root) {
 }
 
 // - 二叉树最近公共祖先
-
+function lowestCommonAnc(root, p, q) {
+  if (!root || root === p || root === q) return root;
+  const left = lowestCommonAnc(root.left, p, q);
+  const right = lowestCommonAnc(root.right, p, q);
+  if (left && right) return root;
+  return left || right;
+}
 // - 对象 DFS/BFS、多叉树层序
+// - 普通树最大深度
+// - 普通树层序遍历
+// - 普通树前序 / 后序遍历
+// - 普通树路径总和
+// - 普通树最近公共祖先
+function dfsObj(obj) {
+  console.log(obj);
+  for (const key in obj) {
+    if (Object.hasOwnProperty.call(obj, key)) {
+      if (typeof obj[key] === "object" && obj[key] !== null) {
+        dfsObj(obj[key]);
+      }
+    }
+  }
+}
+
+function dfsObj2(obj) {
+  const stack = [obj];
+  while (stack.length > 0) {
+    const cur = stack.pop();
+    console.log(cur);
+    for (const key in cur) {
+      if (Object.hasOwnProperty.call(cur, key)) {
+        if (typeof cur[key] === "object" && cur[key]) {
+          stack.push(cur[key]);
+        }
+      }
+    }
+  }
+}
+
+function bfsObj(obj) {
+  const queue = [obj];
+  while (queue.length > 0) {
+    const current = queue.shift();
+    console.log(current);
+    for (const key in current) {
+      if (Object.prototype.hasOwnProperty.call(current, key)) {
+        if (typeof current[key] === "object" && current[key] !== null) {
+          queue.push(current[key]);
+        }
+      }
+    }
+  }
+}
+
+function bfsMuchTree(root) {
+  if (!root) return [];
+  const queue = [root];
+  while (queue.length > 0) {
+    const cur = queue.shift();
+    result.push(cur.val);
+    if (Array.isArray(cur.children)) {
+      for (const child of cur.children) {
+        queue.push(child);
+      }
+    }
+  }
+  return result;
+}
+
 // - 二叉树右视图 / 锯齿层序（补充自 33-answers.js）
+function rightSideTree(root) {
+  if (!root) return [];
+  const res = [];
+  const queue = [root];
+  while (queue.length > 0) {
+    const len = queue.length;
+    let last = null;
+    for (let i = 0; i < len; i++) {
+      const node = queue.unshift();
+      last = node.val;
+      if (node.left) queue.push(node.left);
+      if (node.right) queue.push(node.right);
+    }
+    res.push(last);
+  }
+  return res;
+}
+
+function zigzagLevelOrder(root) {
+  if (!root) return;
+  const result = [];
+  const queue = [root];
+  let leftToRight = true;
+  while (queue.length > 0) {
+    const len = queue.length;
+    const level = [];
+    for (let i = 0; i < len; i++) {
+      const node = queue.shift();
+      if (leftToRight) level.push(node);
+      else leftToRight.unshift(node);
+      if (node.left) queue.push(node.left);
+      if (node.right) queue.push(node.right);
+    }
+    result.push(level);
+    leftToRight = !leftToRight;
+  }
+  return result;
+}
+
 // - 二叉树序列化 / 反序列化（层序，补充自 33-answers.js）
+function serialize(root) {
+  if (!root) return "";
+  const queue = [root];
+  const result = [];
+  while (queue.length > 0) {
+    const node = queue.shift();
+
+    if (node) {
+      result.push(node.val);
+      queue.push(node.left, node.right);
+    } else {
+      result.push("#");
+    }
+  }
+  return result.join(",");
+}
+
+function fanSeria(data) {
+  if (!data) return null;
+  const arr = data.split(",");
+  const root = new TreeNode(arr[0]);
+  const queue = [root];
+  let i = 1;
+  while (i < arr.length) {
+    const node = queue.shift();
+    const left = arr[i++];
+    const right = arr[i++];
+    if (left !== "#" && left) {
+      node.left = new TreeNode(left);
+      queue.push(node.left);
+    }
+    if (right !== "#" && right) {
+      node.right = new TreeNode(right);
+      queue.push(node.right);
+    }
+  }
+  return root;
+}
 // - 二叉树最大深度
+function maxDeep(root) {
+  if (!root) return 0;
+  return Math.max(maxDeep(root.left), maxDeep(root.right)) + 1;
+}
 // - 验证二叉搜索树
+function isVaildBST(root) {
+  function helper(node, min, max) {
+    if (!node) return true;
+    if (node.val <= min || node.val >= max) return false;
+    return (
+      helper(node.left, min, node.val) && helper(node.right, node.val, max)
+    );
+  }
+  return helper(root, -Infinity, Infinity);
+}
 // - 二叉搜索树中第 K 小的元素
+function ktmSmallest(root, k) {
+  const stack = [];
+  let cur = root;
+  let count = 0;
+  while (cur || stack.length) {
+    while (cur) {
+      stack.push(cur);
+      cur = cur.left;
+    }
+    cur = stack.pop();
+    count++;
+    if (count === k) return cur.val;
+    cur = cur.right;
+  }
+  return null;
+}
 // - 路径总和
 // - 在树里寻找 target 值的路径
+function pathSumAll(root, target) {
+  const result = [];
+  const path = [];
+  function dfs(node, sum) {
+    if (!node) return;
+    path.push(node.val);
+    const next = (sum = node.val);
+    if (!node.left && !node.right) {
+      if (next === 0) {
+        result.push(path);
+      }
+    } else {
+      dfs(node.left, next);
+      dfs(node.right, next);
+    }
+  }
+  dfs(root, target);
+  return result;
+}
 // - 在树里寻找 target 值的路径（路径数量）
+function pathSumFind(root, target) {
+  const prefix = new Map();
+  prefix.set(0, 1);
+  let count = 0;
+  function dfs(node, sum) {
+    if (!node) return;
+    const cur = sum + node.val;
+    const need = target - cur;
+    if (prefix.has(need)) count += prefix.get(need);
+    prefix.set(cur, (prefix.get(cur) || 0) + 1);
+    dfs(node.left, cur);
+    dfs(node.right, prefix.get(cur) - 1);
+  }
+  dfs(root, 0);
+  return count;
+}
 // - 对称二叉树
+function isSym(root) {
+  function IsMir(a, b) {
+    if (!a && !b) return true;
+    if (!a || !b) return false;
+    if (a.val !== b.val) return false;
+    return IsMir(a.left, b.right) && IsMir(a.right, b.left);
+  }
+  return IsMir(root, root);
+}
 // - 平衡二叉树
+function isBalanced(root) {
+  function height(node) {
+    if (!node) return 0;
+    const left = height(node.left);
+    if (left === -1) return -1;
+    const right = height(node.right);
+    if (right === -1) return -1;
+    if (Math.abs(left - right) > 1) return -1;
+    return Math.max(left, right) + 1;
+  }
+  return height(root) !== -1;
+}
 // - 二叉树最小深度
+function minDepth(root) {
+  if (!root) return 0;
+  if (!root.left && !root.right) return 1;
+  if (!root.left) return minDepth(root.right) + 1;
+  if (!root.right) return minDepth(root.left) + 1;
+  return Math.min(minDepth(root.left), minDepth(root.right));
+}
 // - 二叉树直径
+function lastLengthTree(root) {
+  let max = 0;
+  function depth(node) {
+    if (!node) return 0;
+    const left = depth(node.left);
+    const right = depth(node.right);
+    max = Math.max(max, left + right);
+    return Math.max(left, right) + 1;
+  }
+  depth(root);
+  return max;
+}
 // - 从前序与中序构建二叉树
 //
 // 图 / 并查集

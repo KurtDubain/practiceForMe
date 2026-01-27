@@ -20,6 +20,8 @@
     - [深比较](#深比较)
     - [URL 参数解析 / 序列化](#url-参数解析--序列化)
     - [数组去重](#数组去重)
+    - [深度合并（deepMerge）](#深度合并deepmerge)
+    - [对象路径取值与赋值](#对象路径取值与赋值)
   - [JS 语言基础手写](#js-语言基础手写)
     - [instanceof 手写](#instanceof-手写)
     - [call / apply / bind](#call--apply--bind)
@@ -37,6 +39,10 @@
     - [Promise 并发限制](#promise-并发限制)
     - [Promise 队列 + 并发控制](#promise-队列--并发控制)
     - [Promise 串行执行器（调用一次执行一次）](#promise-串行执行器调用一次执行一次)
+    - [Promise.race 手写](#promiserace-手写)
+    - [Promise.allSettled 手写](#promiseallsettled-手写)
+    - [Promise.any 手写](#promiseany-手写)
+    - [Promise 超时包装（timeout）](#promise-超时包装timeout)
   - [数据结构设计题](#数据结构设计题)
     - [LRUCache](#lrucache)
     - [RandomizedSet（补充自 33-answers.js）](#randomizedset补充自-33-answersjs)
@@ -69,6 +75,20 @@
     - [旋转数组](#旋转数组)
     - [滑动窗口最大值](#滑动窗口最大值)
     - [字母异位词分组](#字母异位词分组)
+    - [和为 K 的子数组](#和为-k-的子数组)
+    - [最长连续序列](#最长连续序列)
+    - [除自身以外数组的乘积](#除自身以外数组的乘积)
+    - [前 K 个高频元素](#前-k-个高频元素)
+    - [买卖股票的最佳时机](#买卖股票的最佳时机)
+    - [跳跃游戏](#跳跃游戏)
+    - [子集](#子集)
+    - [组合总和](#组合总和)
+    - [括号生成](#括号生成)
+    - [每日温度（单调栈）](#每日温度单调栈)
+    - [柱状图中最大的矩形（单调栈）](#柱状图中最大的矩形单调栈)
+    - [搜索插入位置](#搜索插入位置)
+    - [搜索范围（左右边界二分）](#搜索范围左右边界二分)
+    - [寻找旋转排序数组中的最小值](#寻找旋转排序数组中的最小值)
   - [排序](#排序)
     - [快速排序](#快速排序)
     - [归并排序](#归并排序)
@@ -95,6 +115,11 @@
     - [二叉树遍历（前/中/后/层序）](#二叉树遍历前中后层序)
     - [二叉树最近公共祖先](#二叉树最近公共祖先)
     - [对象 DFS/BFS、多叉树层序](#对象-dfsbfs多叉树层序)
+    - [普通树最大深度](#普通树最大深度)
+    - [普通树层序遍历](#普通树层序遍历)
+    - [普通树前序 / 后序遍历](#普通树前序--后序遍历)
+    - [普通树路径总和](#普通树路径总和)
+    - [普通树最近公共祖先](#普通树最近公共祖先)
     - [二叉树右视图 / 锯齿层序（补充自 33-answers.js）](#二叉树右视图--锯齿层序补充自-33-answersjs)
     - [二叉树序列化 / 反序列化（层序，补充自 33-answers.js）](#二叉树序列化--反序列化层序补充自-33-answersjs)
     - [二叉树最大深度](#二叉树最大深度)
@@ -433,6 +458,70 @@ function uniqueArray(arr) {
 }
 ```
 
+<a id="deepmerge"></a>
+### 深度合并（deepMerge）
+```js
+function isPlainObject(value) {
+  return value != null && typeof value === "object" && !Array.isArray(value);
+}
+
+function deepMerge(target, source) {
+  const result = isPlainObject(target) ? { ...target } : {};
+  if (!isPlainObject(source)) return result;
+
+  for (const [key, value] of Object.entries(source)) {
+    if (Array.isArray(value)) {
+      result[key] = value.slice();
+    } else if (isPlainObject(value)) {
+      result[key] = deepMerge(result[key], value);
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
+}
+```
+
+<a id="pathgetset"></a>
+### 对象路径取值与赋值
+```js
+function toPath(path) {
+  if (Array.isArray(path)) return path.map(String);
+  return String(path)
+    .replace(/\[(\d+)\]/g, ".$1")
+    .replace(/\["([^"]+)"\]/g, ".$1")
+    .replace(/\['([^']+)'\]/g, ".$1")
+    .split(".")
+    .filter(Boolean);
+}
+
+function getByPath(obj, path, defaultValue) {
+  const parts = toPath(path);
+  let cur = obj;
+  for (const key of parts) {
+    if (cur == null) return defaultValue;
+    cur = cur[key];
+  }
+  return cur === undefined ? defaultValue : cur;
+}
+
+function setByPath(obj, path, value) {
+  const parts = toPath(path);
+  if (parts.length === 0) return obj;
+  let cur = obj;
+  for (let i = 0; i < parts.length - 1; i++) {
+    const key = parts[i];
+    const nextKey = parts[i + 1];
+    if (cur[key] == null || typeof cur[key] !== "object") {
+      cur[key] = /^\d+$/.test(nextKey) ? [] : {};
+    }
+    cur = cur[key];
+  }
+  cur[parts[parts.length - 1]] = value;
+  return obj;
+}
+```
+
 [⬆ 返回目录](#目录)
 
 ## JS 语言基础手写
@@ -761,6 +850,106 @@ function createSerialExecutor() {
     last = last.then(() => task(), () => task());
     return last;
   };
+}
+```
+
+<a id="promiserace"></a>
+### Promise.race 手写
+```js
+function promiseRace(promises) {
+  return new Promise((resolve, reject) => {
+    for (const p of promises) {
+      Promise.resolve(p).then(resolve, reject);
+    }
+  });
+}
+```
+
+<a id="promiseallsettled"></a>
+### Promise.allSettled 手写
+```js
+function promiseAllSettled(promises) {
+  const list = Array.from(promises);
+  return new Promise((resolve) => {
+    if (list.length === 0) {
+      resolve([]);
+      return;
+    }
+    const results = new Array(list.length);
+    let done = 0;
+    list.forEach((p, i) => {
+      Promise.resolve(p)
+        .then(
+          (value) => {
+            results[i] = { status: "fulfilled", value };
+          },
+          (reason) => {
+            results[i] = { status: "rejected", reason };
+          }
+        )
+        .then(() => {
+          done++;
+          if (done === list.length) resolve(results);
+        });
+    });
+  });
+}
+```
+
+<a id="promiseany"></a>
+### Promise.any 手写
+```js
+function promiseAny(promises) {
+  const list = Array.from(promises);
+  return new Promise((resolve, reject) => {
+    if (list.length === 0) {
+      const err =
+        typeof AggregateError !== "undefined"
+          ? new AggregateError([], "All promises were rejected")
+          : Object.assign(new Error("All promises were rejected"), { errors: [] });
+      reject(err);
+      return;
+    }
+    const errors = new Array(list.length);
+    let rejected = 0;
+    list.forEach((p, i) => {
+      Promise.resolve(p).then(
+        resolve,
+        (reason) => {
+          errors[i] = reason;
+          rejected++;
+          if (rejected === list.length) {
+            const err =
+              typeof AggregateError !== "undefined"
+                ? new AggregateError(errors, "All promises were rejected")
+                : Object.assign(new Error("All promises were rejected"), { errors });
+            reject(err);
+          }
+        }
+      );
+    });
+  });
+}
+```
+
+<a id="promisetimeout"></a>
+### Promise 超时包装（timeout）
+```js
+function withTimeout(promise, ms, message = "Timeout") {
+  let timer = null;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(message)), ms);
+  });
+  return Promise.race([Promise.resolve(promise), timeout]).then(
+    (value) => {
+      clearTimeout(timer);
+      return value;
+    },
+    (err) => {
+      clearTimeout(timer);
+      throw err;
+    }
+  );
 }
 ```
 
@@ -1609,6 +1798,284 @@ function groupAnagrams(strs) {
 }
 ```
 
+<a id="subarraysum"></a>
+### 和为 K 的子数组
+```js
+function subarraySum(nums, k) {
+  const map = new Map();
+  map.set(0, 1);
+  let sum = 0;
+  let count = 0;
+  for (const x of nums) {
+    sum += x;
+    const need = sum - k;
+    if (map.has(need)) count += map.get(need);
+    map.set(sum, (map.get(sum) || 0) + 1);
+  }
+  return count;
+}
+```
+
+<a id="longestconsecutive"></a>
+### 最长连续序列
+```js
+function longestConsecutive(nums) {
+  const set = new Set(nums);
+  let best = 0;
+  for (const x of set) {
+    if (set.has(x - 1)) continue; // only start from sequence head
+    let cur = x;
+    let len = 1;
+    while (set.has(cur + 1)) {
+      cur++;
+      len++;
+    }
+    best = Math.max(best, len);
+  }
+  return best;
+}
+```
+
+<a id="productexceptself"></a>
+### 除自身以外数组的乘积
+```js
+function productExceptSelf(nums) {
+  const n = nums.length;
+  const res = new Array(n).fill(1);
+  let prefix = 1;
+  for (let i = 0; i < n; i++) {
+    res[i] = prefix;
+    prefix *= nums[i];
+  }
+  let suffix = 1;
+  for (let i = n - 1; i >= 0; i--) {
+    res[i] *= suffix;
+    suffix *= nums[i];
+  }
+  return res;
+}
+```
+
+<a id="topkfrequent"></a>
+### 前 K 个高频元素
+```js
+function topKFrequent(nums, k) {
+  const freq = new Map();
+  for (const x of nums) freq.set(x, (freq.get(x) || 0) + 1);
+
+  const buckets = Array.from({ length: nums.length + 1 }, () => []);
+  for (const [num, count] of freq.entries()) {
+    buckets[count].push(num);
+  }
+
+  const result = [];
+  for (let i = buckets.length - 1; i >= 0 && result.length < k; i--) {
+    for (const num of buckets[i]) {
+      result.push(num);
+      if (result.length === k) break;
+    }
+  }
+  return result;
+}
+```
+
+<a id="maxprofit"></a>
+### 买卖股票的最佳时机
+```js
+function maxProfit(prices) {
+  let minPrice = Infinity;
+  let best = 0;
+  for (const p of prices) {
+    minPrice = Math.min(minPrice, p);
+    best = Math.max(best, p - minPrice);
+  }
+  return best;
+}
+```
+
+<a id="canjump"></a>
+### 跳跃游戏
+```js
+function canJump(nums) {
+  let farthest = 0;
+  for (let i = 0; i < nums.length; i++) {
+    if (i > farthest) return false;
+    farthest = Math.max(farthest, i + nums[i]);
+  }
+  return true;
+}
+```
+
+<a id="subsets"></a>
+### 子集
+```js
+function subsets(nums) {
+  const result = [];
+  const path = [];
+  function dfs(index) {
+    if (index === nums.length) {
+      result.push([...path]);
+      return;
+    }
+    dfs(index + 1);
+    path.push(nums[index]);
+    dfs(index + 1);
+    path.pop();
+  }
+  dfs(0);
+  return result;
+}
+```
+
+<a id="combinationsum"></a>
+### 组合总和
+```js
+function combinationSum(candidates, target) {
+  const result = [];
+  const path = [];
+  function dfs(start, sum) {
+    if (sum === target) {
+      result.push([...path]);
+      return;
+    }
+    if (sum > target) return;
+    for (let i = start; i < candidates.length; i++) {
+      const val = candidates[i];
+      path.push(val);
+      dfs(i, sum + val);
+      path.pop();
+    }
+  }
+  dfs(0, 0);
+  return result;
+}
+```
+
+<a id="generateparenthesis"></a>
+### 括号生成
+```js
+function generateParenthesis(n) {
+  const res = [];
+  function dfs(open, close, str) {
+    if (str.length === 2 * n) {
+      res.push(str);
+      return;
+    }
+    if (open < n) dfs(open + 1, close, str + "(");
+    if (close < open) dfs(open, close + 1, str + ")");
+  }
+  dfs(0, 0, "");
+  return res;
+}
+```
+
+<a id="dailytemperatures"></a>
+### 每日温度（单调栈）
+```js
+function dailyTemperatures(temperatures) {
+  const n = temperatures.length;
+  const res = new Array(n).fill(0);
+  const stack = [];
+  for (let i = 0; i < n; i++) {
+    while (
+      stack.length &&
+      temperatures[i] > temperatures[stack[stack.length - 1]]
+    ) {
+      const j = stack.pop();
+      res[j] = i - j;
+    }
+    stack.push(i);
+  }
+  return res;
+}
+```
+
+<a id="largestrectangle"></a>
+### 柱状图中最大的矩形（单调栈）
+```js
+function largestRectangleArea(heights) {
+  const stack = [];
+  let best = 0;
+  const arr = heights.concat(0); // sentinel
+  for (let i = 0; i < arr.length; i++) {
+    while (stack.length && arr[i] < arr[stack[stack.length - 1]]) {
+      const h = arr[stack.pop()];
+      const right = i;
+      const left = stack.length ? stack[stack.length - 1] : -1;
+      best = Math.max(best, h * (right - left - 1));
+    }
+    stack.push(i);
+  }
+  return best;
+}
+```
+
+<a id="searchinsert"></a>
+### 搜索插入位置
+```js
+function searchInsert(nums, target) {
+  let left = 0;
+  let right = nums.length;
+  while (left < right) {
+    const mid = left + ((right - left) >> 1);
+    if (nums[mid] < target) left = mid + 1;
+    else right = mid;
+  }
+  return left;
+}
+```
+
+<a id="searchrange"></a>
+### 搜索范围（左右边界二分）
+```js
+function lowerBound(nums, target) {
+  let left = 0;
+  let right = nums.length;
+  while (left < right) {
+    const mid = left + ((right - left) >> 1);
+    if (nums[mid] < target) left = mid + 1;
+    else right = mid;
+  }
+  return left;
+}
+
+function upperBound(nums, target) {
+  let left = 0;
+  let right = nums.length;
+  while (left < right) {
+    const mid = left + ((right - left) >> 1);
+    if (nums[mid] <= target) left = mid + 1;
+    else right = mid;
+  }
+  return left;
+}
+
+function searchRange(nums, target) {
+  const left = lowerBound(nums, target);
+  const right = upperBound(nums, target) - 1;
+  if (left <= right && nums[left] === target) return [left, right];
+  return [-1, -1];
+}
+```
+
+<a id="findmin"></a>
+### 寻找旋转排序数组中的最小值
+```js
+function findMin(nums) {
+  let left = 0;
+  let right = nums.length - 1;
+  while (left < right) {
+    const mid = left + ((right - left) >> 1);
+    if (nums[mid] > nums[right]) {
+      left = mid + 1;
+    } else {
+      right = mid;
+    }
+  }
+  return nums[left];
+}
+```
+
 [⬆ 返回目录](#目录)
 
 ## 排序
@@ -2167,6 +2634,127 @@ function bfsMuchTree(root) {
   }
   return result;
 }
+
+<a id="narynode"></a>
+### 普通树最大深度
+```js
+class NTreeNode {
+  constructor(val, children = []) {
+    this.val = val;
+    this.children = children;
+  }
+}
+
+function naryMaxDepth(root) {
+  if (!root) return 0;
+  let max = 0;
+  if (Array.isArray(root.children)) {
+    for (const child of root.children) {
+      max = Math.max(max, naryMaxDepth(child));
+    }
+  }
+  return max + 1;
+}
+```
+
+<a id="narylevelorder"></a>
+### 普通树层序遍历
+```js
+function naryLevelOrder(root) {
+  if (!root) return [];
+  const result = [];
+  const queue = [root];
+  while (queue.length) {
+    const len = queue.length;
+    const level = [];
+    for (let i = 0; i < len; i++) {
+      const node = queue.shift();
+      level.push(node.val);
+      if (Array.isArray(node.children)) {
+        for (const child of node.children) {
+          if (child) queue.push(child);
+        }
+      }
+    }
+    result.push(level);
+  }
+  return result;
+}
+```
+
+<a id="narytraversal"></a>
+### 普通树前序 / 后序遍历
+```js
+function naryPreorder(root) {
+  const result = [];
+  function dfs(node) {
+    if (!node) return;
+    result.push(node.val);
+    if (Array.isArray(node.children)) {
+      for (const child of node.children) dfs(child);
+    }
+  }
+  dfs(root);
+  return result;
+}
+
+function naryPostorder(root) {
+  const result = [];
+  function dfs(node) {
+    if (!node) return;
+    if (Array.isArray(node.children)) {
+      for (const child of node.children) dfs(child);
+    }
+    result.push(node.val);
+  }
+  dfs(root);
+  return result;
+}
+```
+
+<a id="narypathsum"></a>
+### 普通树路径总和
+```js
+function naryPathSum(root, targetSum) {
+  const result = [];
+  const path = [];
+  function dfs(node, sum) {
+    if (!node) return;
+    path.push(node.val);
+    const next = sum - node.val;
+    const children = Array.isArray(node.children) ? node.children : [];
+    if (children.length === 0) {
+      if (next === 0) result.push([...path]);
+    } else {
+      for (const child of children) dfs(child, next);
+    }
+    path.pop();
+  }
+  dfs(root, targetSum);
+  return result;
+}
+```
+
+<a id="narylca"></a>
+### 普通树最近公共祖先
+```js
+function naryLowestCommonAncestor(root, p, q) {
+  let lca = null;
+  function dfs(node) {
+    if (!node) return 0;
+    let count = node === p || node === q ? 1 : 0;
+    if (Array.isArray(node.children)) {
+      for (const child of node.children) {
+        count += dfs(child);
+      }
+    }
+    if (count >= 2 && lca === null) lca = node;
+    return count;
+  }
+  dfs(root);
+  return lca;
+}
+```
 
 <a id="rightview"></a>
 ### 二叉树右视图 / 锯齿层序（补充自 33-answers.js）
