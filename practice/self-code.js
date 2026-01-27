@@ -1,159 +1,9 @@
-# 前端算法 & 手写题升级版（按类别整理，含完整实现）
 
-> 包含原 `algorithms-from-js` 的全部题目实现，并按类别重组，便于快速定位。每节末尾有「返回目录」。
 
-## 目录
-- [前端算法 \& 手写题升级版（按类别整理，含完整实现）](#前端算法--手写题升级版按类别整理含完整实现)
-  - [目录](#目录)
-  - [工程 / 工具类](#工程--工具类)
-    - [节流](#节流)
-    - [防抖](#防抖)
-    - [简单 EventBus](#简单-eventbus)
-    - [Observable（发布订阅）](#observable发布订阅)
-    - [千分位转换](#千分位转换)
-    - [下划线/中划线转驼峰](#下划线中划线转驼峰)
-    - [自定义数组解析（简化版）](#自定义数组解析简化版)
-    - [封装 indexOf](#封装-indexof)
-    - [16 进制转 10 进制](#16-进制转-10-进制)
-    - [数组扁平化](#数组扁平化)
-    - [对象扁平化](#对象扁平化)
-    - [深比较](#深比较)
-    - [URL 参数解析 / 序列化](#url-参数解析--序列化)
-    - [数组去重](#数组去重)
-    - [深度合并（deepMerge）](#深度合并deepmerge)
-    - [对象路径取值与赋值](#对象路径取值与赋值)
-  - [JS 语言基础手写](#js-语言基础手写)
-    - [instanceof 手写](#instanceof-手写)
-    - [call / apply / bind](#call--apply--bind)
-    - [手写 new](#手写-new)
-    - [柯里化](#柯里化)
-    - [柯里化（可变参数）](#柯里化可变参数)
-    - [函数组合（compose / pipe）](#函数组合compose--pipe)
-    - [函数记忆（memoize）](#函数记忆memoize)
-    - [函数只执行一次（once）](#函数只执行一次once)
-    - [原型链继承](#原型链继承)
-    - [构造函数继承](#构造函数继承)
-    - [组合继承](#组合继承)
-    - [原型式继承](#原型式继承)
-    - [寄生式继承](#寄生式继承)
-    - [寄生组合继承](#寄生组合继承)
-    - [ES6 class 继承](#es6-class-继承)
-    - [深拷贝（处理循环引用）](#深拷贝处理循环引用)
-  - [异步与 Promise 控制](#异步与-promise-控制)
-    - [Promise.all 手写](#promiseall-手写)
-    - [Promise 的 retry](#promise-的-retry)
-    - [Promise 的递归调用（顺序执行任务）](#promise-的递归调用顺序执行任务)
-    - [Promise 并发限制](#promise-并发限制)
-    - [Promise 队列 + 并发控制](#promise-队列--并发控制)
-    - [Promise 串行执行器（调用一次执行一次）](#promise-串行执行器调用一次执行一次)
-    - [Promise.race 手写](#promiserace-手写)
-    - [Promise.allSettled 手写](#promiseallsettled-手写)
-    - [Promise.any 手写](#promiseany-手写)
-    - [Promise 超时包装（timeout）](#promise-超时包装timeout)
-  - [数据结构设计题](#数据结构设计题)
-    - [LRUCache](#lrucache)
-    - [RandomizedSet（补充自 33-answers.js）](#randomizedset补充自-33-answersjs)
-    - [LFUCache（补充自 33-answers.js）](#lfucache补充自-33-answersjs)
-    - [MinStack](#minstack)
-    - [用栈实现队列](#用栈实现队列)
-    - [用队列实现栈](#用队列实现栈)
-    - [前缀树 Trie](#前缀树-trie)
-  - [数组 / 字符串 / 双指针](#数组--字符串--双指针)
-    - [大数相加](#大数相加)
-    - [Two Sum（返回数对）](#two-sum返回数对)
-    - [最长无重复子串](#最长无重复子串)
-    - [最小覆盖子串](#最小覆盖子串)
-    - [下一个更大元素（单调栈）](#下一个更大元素单调栈)
-    - [合并区间](#合并区间)
-    - [二分查找 \& 旋转数组搜索](#二分查找--旋转数组搜索)
-    - [三数之和](#三数之和)
-    - [接雨水](#接雨水)
-    - [对角线遍历矩阵](#对角线遍历矩阵)
-    - [全排列](#全排列)
-    - [数组转树](#数组转树)
-    - [Pow（递归 + 快速幂）](#pow递归--快速幂)
-    - [括号闭合](#括号闭合)
-    - [KMP 字符串匹配](#kmp-字符串匹配)
-    - [前 K 大（小顶堆）](#前-k-大小顶堆)
-    - [移动零](#移动零)
-    - [盛最多水](#盛最多水)
-    - [最长公共前缀](#最长公共前缀)
-    - [合并两个有序数组](#合并两个有序数组)
-    - [旋转数组](#旋转数组)
-    - [滑动窗口最大值](#滑动窗口最大值)
-    - [字母异位词分组](#字母异位词分组)
-    - [和为 K 的子数组](#和为-k-的子数组)
-    - [最长连续序列](#最长连续序列)
-    - [除自身以外数组的乘积](#除自身以外数组的乘积)
-    - [前 K 个高频元素](#前-k-个高频元素)
-    - [买卖股票的最佳时机](#买卖股票的最佳时机)
-    - [跳跃游戏](#跳跃游戏)
-    - [子集](#子集)
-    - [组合总和](#组合总和)
-    - [括号生成](#括号生成)
-    - [每日温度（单调栈）](#每日温度单调栈)
-    - [柱状图中最大的矩形（单调栈）](#柱状图中最大的矩形单调栈)
-    - [搜索插入位置](#搜索插入位置)
-    - [搜索范围（左右边界二分）](#搜索范围左右边界二分)
-    - [寻找旋转排序数组中的最小值](#寻找旋转排序数组中的最小值)
-  - [排序](#排序)
-    - [快速排序](#快速排序)
-    - [归并排序](#归并排序)
-  - [动态规划](#动态规划)
-    - [零钱兑换](#零钱兑换)
-    - [爬楼梯](#爬楼梯)
-    - [打家劫舍](#打家劫舍)
-    - [最长上升子序列（O(n^2)）](#最长上升子序列on2)
-    - [编辑距离](#编辑距离)
-    - [最大子数组和](#最大子数组和)
-    - [不同路径](#不同路径)
-    - [最长公共子序列](#最长公共子序列)
-  - [链表](#链表)
-    - [反转链表](#反转链表)
-    - [合并两个有序链表](#合并两个有序链表)
-    - [回文链表](#回文链表)
-    - [K 个一组反转链表（补充自 33-answers.js）](#k-个一组反转链表补充自-33-answersjs)
-    - [环形链表](#环形链表)
-    - [删除倒数第 N 个节点](#删除倒数第-n-个节点)
-    - [相交链表](#相交链表)
-    - [两数相加](#两数相加)
-  - [树](#树)
-    - [翻转二叉树](#翻转二叉树)
-    - [二叉树遍历（前/中/后/层序）](#二叉树遍历前中后层序)
-    - [二叉树最近公共祖先](#二叉树最近公共祖先)
-    - [对象 DFS/BFS、多叉树层序](#对象-dfsbfs多叉树层序)
-    - [普通树最大深度](#普通树最大深度)
-    - [普通树层序遍历](#普通树层序遍历)
-    - [普通树前序 / 后序遍历](#普通树前序--后序遍历)
-    - [普通树路径总和](#普通树路径总和)
-    - [普通树最近公共祖先](#普通树最近公共祖先)
-    - [二叉树右视图 / 锯齿层序（补充自 33-answers.js）](#二叉树右视图--锯齿层序补充自-33-answersjs)
-    - [二叉树序列化 / 反序列化（层序，补充自 33-answers.js）](#二叉树序列化--反序列化层序补充自-33-answersjs)
-    - [二叉树最大深度](#二叉树最大深度)
-    - [验证二叉搜索树](#验证二叉搜索树)
-    - [二叉搜索树中第 K 小的元素](#二叉搜索树中第-k-小的元素)
-    - [路径总和](#路径总和)
-    - [在树里寻找 target 值的路径](#在树里寻找-target-值的路径)
-    - [在树里寻找 target 值的路径（路径数量）](#在树里寻找-target-值的路径路径数量)
-    - [对称二叉树](#对称二叉树)
-    - [平衡二叉树](#平衡二叉树)
-    - [二叉树最小深度](#二叉树最小深度)
-    - [二叉树直径](#二叉树直径)
-    - [从前序与中序构建二叉树](#从前序与中序构建二叉树)
-  - [图 / 并查集](#图--并查集)
-    - [并查集 + 岛屿数量](#并查集--岛屿数量)
-    - [课程表（拓扑排序，补充自 33-answers.js）](#课程表拓扑排序补充自-33-answersjs)
-    - [课程表 II（拓扑排序输出）](#课程表-ii拓扑排序输出)
-    - [腐烂的橘子](#腐烂的橘子)
-    - [省份数量](#省份数量)
+// ## 工程 / 工具类
 
----
 
-## 工程 / 工具类
-
-<a id="throttle"></a>
-### 节流
-```js
+// ### 节流
 function throttle(func, delay) {
   let timer = null;
   return function throttled(...args) {
@@ -165,11 +15,10 @@ function throttle(func, delay) {
     }
   };
 }
-```
+// ```
 
-<a id="debounce"></a>
-### 防抖
-```js
+
+// ### 防抖
 function debounce(func, delay) {
   let timer = null;
   return function debounced(...args) {
@@ -179,11 +28,9 @@ function debounce(func, delay) {
     }, delay);
   };
 }
-```
 
-<a id="eventbus"></a>
-### 简单 EventBus
-```js
+// ### 简单 EventBus
+
 class EventBus {
   constructor() {
     this.events = new Map();
@@ -218,11 +65,9 @@ class EventBus {
     this.on(event, wrapper);
   }
 }
-```
 
-<a id="observable"></a>
-### Observable（发布订阅）
-```js
+
+// ### Observable（发布订阅）
 class Observable {
   constructor(value) {
     this.value = value;
@@ -244,11 +89,10 @@ class Observable {
     return this.value;
   }
 }
-```
 
-<a id="changek"></a>
-### 千分位转换
-```js
+
+// ### 千分位转换
+
 function changeK(str) {
   const [intStr, decStr] = str.split(".");
   const chars = intStr.replace(/^(-)/, "").split("");
@@ -269,11 +113,10 @@ function changeK(str) {
   const intPart = sign + result.join("");
   return decStr != null ? `${intPart}.${decStr}` : intPart;
 }
-```
 
-<a id="changetocamel"></a>
-### 下划线/中划线转驼峰
-```js
+
+// ### 下划线/中划线转驼峰
+
 function changeToCamel(str) {
   const parts = str.split(/[-_]/);
   if (parts.length === 0) return "";
@@ -285,11 +128,11 @@ function changeToCamel(str) {
   }
   return result.join("");
 }
-```
 
-<a id="parsearr"></a>
-### 自定义数组解析（简化版）
-```js
+
+
+// ### 自定义数组解析（简化版）
+
 function parseArr(str) {
   let index = 0;
 
@@ -339,19 +182,17 @@ function parseArr(str) {
 
   return parse();
 }
-```
 
-<a id="findsubstringindex"></a>
-### 封装 indexOf
-```js
+
+// ### 封装 indexOf
+
 function findSubStringIndex(strDad, strSon) {
   return strDad.indexOf(strSon);
 }
-```
 
-<a id="ch16to10"></a>
-### 16 进制转 10 进制
-```js
+
+// ### 16 进制转 10 进制
+
 function Ch16To10(str) {
   const keyArr = "0123456789ABCDEF";
   let sum = 0;
@@ -365,11 +206,10 @@ function Ch16To10(str) {
   }
   return sum;
 }
-```
 
-<a id="flattenarray"></a>
-### 数组扁平化
-```js
+
+// ### 数组扁平化
+
 function flattenArray(arr, depth = Infinity) {
   const result = [];
   (function flat(current, d) {
@@ -383,11 +223,11 @@ function flattenArray(arr, depth = Infinity) {
   })(arr, depth);
   return result;
 }
-```
 
-<a id="flattenobject"></a>
-### 对象扁平化
-```js
+
+
+// ### 对象扁平化
+
 function flattenObject(obj, prefix = "") {
   const result = {};
   for (const [key, value] of Object.entries(obj)) {
@@ -400,11 +240,11 @@ function flattenObject(obj, prefix = "") {
   }
   return result;
 }
-```
 
-<a id="deepequal"></a>
-### 深比较
-```js
+
+
+// ### 深比较
+
 function deepEqual(a, b) {
   if (Object.is(a, b)) return true;
   if (typeof a !== typeof b) return false;
@@ -420,11 +260,10 @@ function deepEqual(a, b) {
   }
   return false;
 }
-```
 
-<a id="querystring"></a>
-### URL 参数解析 / 序列化
-```js
+
+// ### URL 参数解析 / 序列化
+
 function parseQuery(query) {
   const q = query.startsWith("?") ? query.slice(1) : query;
   const result = {};
@@ -455,19 +294,18 @@ function stringifyQuery(obj) {
   }
   return parts.length ? `?${parts.join("&")}` : "";
 }
-```
 
-<a id="uniquearray"></a>
-### 数组去重
-```js
+
+// ### 数组去重
+
 function uniqueArray(arr) {
   return Array.from(new Set(arr));
 }
-```
 
-<a id="deepmerge"></a>
-### 深度合并（deepMerge）
-```js
+
+
+// ### 深度合并（deepMerge）
+
 function isPlainObject(value) {
   return value != null && typeof value === "object" && !Array.isArray(value);
 }
@@ -487,11 +325,11 @@ function deepMerge(target, source) {
   }
   return result;
 }
-```
 
-<a id="pathgetset"></a>
-### 对象路径取值与赋值
-```js
+
+
+// ### 对象路径取值与赋值
+
 function toPath(path) {
   if (Array.isArray(path)) return path.map(String);
   return String(path)
@@ -527,15 +365,12 @@ function setByPath(obj, path, value) {
   cur[parts[parts.length - 1]] = value;
   return obj;
 }
-```
 
-[⬆ 返回目录](#目录)
 
-## JS 语言基础手写
 
-<a id="newinstanceof"></a>
-### instanceof 手写
-```js
+
+// ### instanceof 手写
+
 function NewInstanceof(obj, constructor) {
   if (obj === null || (typeof obj !== "object" && typeof obj !== "function")) {
     return false;
@@ -549,11 +384,9 @@ function NewInstanceof(obj, constructor) {
   }
   return false;
 }
-```
 
-<a id="callapplybind"></a>
-### call / apply / bind
-```js
+// ### call / apply / bind
+
 Function.prototype.myCall = function (context, ...args) {
   context = context == null ? globalThis : Object(context);
   const fn = Symbol("fn");
@@ -578,21 +411,21 @@ Function.prototype.myBind = function (context, ...args) {
     return fn.apply(context, args.concat(newArgs));
   };
 };
-```
 
-<a id="mynew"></a>
-### 手写 new
-```js
+
+
+// ### 手写 new
+
 function myNew(constructor, ...args) {
   const newObj = Object.create(constructor.prototype);
   const result = constructor.apply(newObj, args);
   return result && typeof result === "object" ? result : newObj;
 }
-```
 
-<a id="curry"></a>
-### 柯里化
-```js
+
+
+// ### 柯里化
+
 function curry(func) {
   return function curried(...args) {
     if (args.length >= func.length) {
@@ -604,11 +437,11 @@ function curry(func) {
     }
   };
 }
-```
 
-<a id="currysum"></a>
-### 柯里化（可变参数）
-```js
+
+
+// ### 柯里化（可变参数）
+
 function currySum(...args) {
   let total = args.reduce((sum, val) => sum + val, 0);
   function next(...more) {
@@ -618,11 +451,10 @@ function currySum(...args) {
   }
   return next;
 }
-```
 
-<a id="composepipe"></a>
-### 函数组合（compose / pipe）
-```js
+
+// ### 函数组合（compose / pipe）
+
 function compose(...fns) {
   return function (input) {
     return fns.reduceRight((acc, fn) => fn(acc), input);
@@ -634,11 +466,11 @@ function pipe(...fns) {
     return fns.reduce((acc, fn) => fn(acc), input);
   };
 }
-```
 
-<a id="memoize"></a>
-### 函数记忆（memoize）
-```js
+
+
+// ### 函数记忆（memoize）
+
 function memoize(fn) {
   const cache = new Map();
   return function (...args) {
@@ -649,11 +481,11 @@ function memoize(fn) {
     return result;
   };
 }
-```
 
-<a id="once"></a>
-### 函数只执行一次（once）
-```js
+
+
+// ### 函数只执行一次（once）
+
 function once(fn) {
   let called = false;
   let result;
@@ -665,11 +497,10 @@ function once(fn) {
     return result;
   };
 }
-```
 
-<a id="inherit-prototype"></a>
-### 原型链继承
-```js
+
+// ### 原型链继承
+
 function Parent(name) {
   this.name = name;
   this.colors = ["red", "blue"];
@@ -681,11 +512,10 @@ Parent.prototype.getName = function () {
 function Child() {}
 Child.prototype = new Parent("parent");
 Child.prototype.constructor = Child;
-```
 
-<a id="inherit-constructor"></a>
-### 构造函数继承
-```js
+
+// ### 构造函数继承
+
 function Parent(name) {
   this.name = name;
   this.colors = ["red", "blue"];
@@ -695,11 +525,11 @@ function Child(name, age) {
   Parent.call(this, name); // 借用构造函数
   this.age = age;
 }
-```
 
-<a id="inherit-combination"></a>
-### 组合继承
-```js
+
+
+// ### 组合继承
+
 function Parent(name) {
   this.name = name;
   this.colors = ["red", "blue"];
@@ -714,22 +544,17 @@ function Child(name, age) {
 }
 Child.prototype = new Parent("parent");
 Child.prototype.constructor = Child;
-```
 
-<a id="inherit-prototypal"></a>
-### 原型式继承
-```js
+
+// ### 原型式继承
 const parent = {
   name: "parent",
   colors: ["red", "blue"],
 };
 
 const child = Object.create(parent);
-```
 
-<a id="inherit-parasitic"></a>
-### 寄生式继承
-```js
+// ### 寄生式继承
 function createChild(obj) {
   const clone = Object.create(obj);
   clone.sayHi = function () {
@@ -737,11 +562,10 @@ function createChild(obj) {
   };
   return clone;
 }
-```
 
-<a id="inherit-parasitic-combination"></a>
-### 寄生组合继承
-```js
+
+// ### 寄生组合继承
+
 function Parent(name) {
   this.name = name;
   this.colors = ["red", "blue"];
@@ -756,11 +580,10 @@ function Child(name, age) {
 }
 Child.prototype = Object.create(Parent.prototype);
 Child.prototype.constructor = Child;
-```
 
-<a id="inherit-class"></a>
-### ES6 class 继承
-```js
+
+// ### ES6 class 继承
+
 class Parent {
   constructor(name) {
     this.name = name;
@@ -776,11 +599,10 @@ class Child extends Parent {
     this.age = age;
   }
 }
-```
 
-<a id="deepclone"></a>
-### 深拷贝（处理循环引用）
-```js
+
+// ### 深拷贝（处理循环引用）
+
 function Deepclone(obj, visited = new Map()) {
   if (typeof obj !== "object" || obj === null) {
     return obj;
@@ -797,15 +619,13 @@ function Deepclone(obj, visited = new Map()) {
   }
   return clone;
 }
-```
 
-[⬆ 返回目录](#目录)
 
-## 异步与 Promise 控制
 
-<a id="promiseall"></a>
-### Promise.all 手写
-```js
+// ## 异步与 Promise 控制
+
+// ### Promise.all 手写
+
 function promiseAll(arr) {
   return new Promise((resolve, reject) => {
     const results = [];
@@ -830,11 +650,9 @@ function promiseAll(arr) {
     });
   });
 }
-```
 
-<a id="retry"></a>
-### Promise 的 retry
-```js
+
+// ### Promise 的 retry
 function retry(func, count) {
   return new Promise((resolve, reject) => {
     let times = 0;
@@ -856,11 +674,11 @@ function retry(func, count) {
     tryIt();
   });
 }
-```
 
-<a id="diguipromise"></a>
-### Promise 的递归调用（顺序执行任务）
-```js
+
+
+// ### Promise 的递归调用（顺序执行任务）
+
 function DiguiPromise(tasks) {
   const arr = tasks.slice();
 
@@ -884,11 +702,10 @@ function DiguiPromise(tasks) {
 
   return run(0);
 }
-```
 
-<a id="limitconcurrency"></a>
-### Promise 并发限制
-```js
+
+// ### Promise 并发限制
+
 function limitConcurrency(tasks, limit) {
   return new Promise((resolve, reject) => {
     const n = tasks.length;
@@ -923,11 +740,9 @@ function limitConcurrency(tasks, limit) {
     }
   });
 }
-```
 
-<a id="promisequeue"></a>
-### Promise 队列 + 并发控制
-```js
+
+// ### Promise 队列 + 并发控制
 function promiseQueue(tasks, maxConcurrent) {
   const results = [];
   let index = 0;
@@ -957,11 +772,9 @@ function promiseQueue(tasks, maxConcurrent) {
     runTask();
   });
 }
-```
 
-<a id="serialexecutor"></a>
-### Promise 串行执行器（调用一次执行一次）
-```js
+// ### Promise 串行执行器（调用一次执行一次）
+
 function createSerialExecutor() {
   let last = Promise.resolve();
   return function run(task) {
@@ -969,11 +782,8 @@ function createSerialExecutor() {
     return last;
   };
 }
-```
 
-<a id="promiserace"></a>
-### Promise.race 手写
-```js
+// ### Promise.race 手写
 function promiseRace(promises) {
   return new Promise((resolve, reject) => {
     for (const p of promises) {
@@ -981,11 +791,8 @@ function promiseRace(promises) {
     }
   });
 }
-```
 
-<a id="promiseallsettled"></a>
-### Promise.allSettled 手写
-```js
+// ### Promise.allSettled 手写
 function promiseAllSettled(promises) {
   const list = Array.from(promises);
   return new Promise((resolve) => {
@@ -1012,11 +819,8 @@ function promiseAllSettled(promises) {
     });
   });
 }
-```
 
-<a id="promiseany"></a>
-### Promise.any 手写
-```js
+// ### Promise.any 手写
 function promiseAny(promises) {
   const list = Array.from(promises);
   return new Promise((resolve, reject) => {
@@ -1048,11 +852,8 @@ function promiseAny(promises) {
     });
   });
 }
-```
 
-<a id="promisetimeout"></a>
-### Promise 超时包装（timeout）
-```js
+// ### Promise 超时包装（timeout）
 function withTimeout(promise, ms, message = "Timeout") {
   let timer = null;
   const timeout = new Promise((_, reject) => {
@@ -1069,15 +870,11 @@ function withTimeout(promise, ms, message = "Timeout") {
     }
   );
 }
-```
 
-[⬆ 返回目录](#目录)
 
-## 数据结构设计题
+// ## 数据结构设计题
 
-<a id="lru"></a>
-### LRUCache
-```js
+// ### LRUCache
 class LRUCache {
   constructor(capacity) {
     this.capacity = capacity;
@@ -1100,11 +897,8 @@ class LRUCache {
     this.cache.set(key, value);
   }
 }
-```
 
-<a id="randomizedset"></a>
-### RandomizedSet（补充自 33-answers.js）
-```js
+// ### RandomizedSet（补充自 33-answers.js）
 class RandomizedSet {
   constructor() {
     this.arr = [];
@@ -1131,11 +925,9 @@ class RandomizedSet {
     return this.arr[idx];
   }
 }
-```
 
-<a id="lfu"></a>
-### LFUCache（补充自 33-answers.js）
-```js
+
+// ### LFUCache（补充自 33-answers.js）
 class LFUCache {
   constructor(capacity) {
     this.capacity = capacity;
@@ -1182,11 +974,8 @@ class LFUCache {
     this.minFreq = 1;
   }
 }
-```
 
-<a id="minstack"></a>
-### MinStack
-```js
+// ### MinStack
 class MinStack {
   constructor() {
     this.stack = [];
@@ -1216,11 +1005,9 @@ class MinStack {
     return this.minStack[this.minStack.length - 1];
   }
 }
-```
 
-<a id="myqueue"></a>
-### 用栈实现队列
-```js
+// ### 用栈实现队列
+
 class MyQueue {
   constructor() {
     this.inStack = [];
@@ -1253,11 +1040,9 @@ class MyQueue {
     return this.inStack.length === 0 && this.outStack.length === 0;
   }
 }
-```
 
-<a id="mystack"></a>
-### 用队列实现栈
-```js
+
+// ### 用队列实现栈
 class MyStack {
   constructor() {
     this.queue = [];
@@ -1282,11 +1067,9 @@ class MyStack {
     return this.queue.length === 0;
   }
 }
-```
 
-<a id="trie"></a>
-### 前缀树 Trie
-```js
+
+// ### 前缀树 Trie
 class TrieNode {
   constructor() {
     this.children = new Map();
@@ -1328,15 +1111,11 @@ class Trie {
     return true;
   }
 }
-```
 
-[⬆ 返回目录](#目录)
+// ## 数组 / 字符串 / 双指针
 
-## 数组 / 字符串 / 双指针
+// ### 大数相加
 
-<a id="bignumadd"></a>
-### 大数相加
-```js
 function bigNumAdd(str1, str2) {
   let i = str1.length - 1;
   let j = str2.length - 1;
@@ -1355,11 +1134,8 @@ function bigNumAdd(str1, str2) {
   }
   return result.join("");
 }
-```
 
-<a id="findsum"></a>
-### Two Sum（返回数对）
-```js
+// ### Two Sum（返回数对）
 function findSum(arr, target) {
   const map = new Map();
   const result = [];
@@ -1372,11 +1148,8 @@ function findSum(arr, target) {
   }
   return result;
 }
-```
 
-<a id="longestnonrepeat"></a>
-### 最长无重复子串
-```js
+// ### 最长无重复子串
 function longestNonRepeatingSubstring(str) {
   let start = 0;
   let end = 0;
@@ -1399,11 +1172,10 @@ function longestNonRepeatingSubstring(str) {
   }
   return str.substr(maxStart, maxLen);
 }
-```
 
-<a id="minwindow"></a>
-### 最小覆盖子串
-```js
+
+// ### 最小覆盖子串
+
 function minWindowSubstring(s, t) {
   if (!s || !t || s.length < t.length) return "";
   const need = new Map();
@@ -1442,11 +1214,9 @@ function minWindowSubstring(s, t) {
   }
   return minLen === Infinity ? "" : s.slice(start, start + minLen);
 }
-```
 
-<a id="nextgreaterelement"></a>
-### 下一个更大元素（单调栈）
-```js
+// ### 下一个更大元素（单调栈）
+
 function nextGreaterElement(nums) {
   const n = nums.length;
   const res = new Array(n).fill(-1);
@@ -1460,11 +1230,9 @@ function nextGreaterElement(nums) {
   }
   return res;
 }
-```
 
-<a id="mergeintervals"></a>
-### 合并区间
-```js
+// ### 合并区间
+
 function mergeIntervals(intervals) {
   if (intervals.length === 0) return [];
   intervals.sort((a, b) => a[0] - b[0]);
@@ -1480,11 +1248,10 @@ function mergeIntervals(intervals) {
   }
   return result;
 }
-```
 
-<a id="binarysearch"></a>
-### 二分查找 & 旋转数组搜索
-```js
+
+// ### 二分查找 & 旋转数组搜索
+
 function binarySearch(nums, target) {
   let left = 0;
   let right = nums.length - 1;
@@ -1498,7 +1265,6 @@ function binarySearch(nums, target) {
   return -1;
 }
 
-<a id="searchrotatedarray"></a>
 function searchInRotatedArray(nums, target) {
   let left = 0;
   let right = nums.length - 1;
@@ -1521,11 +1287,9 @@ function searchInRotatedArray(nums, target) {
   }
   return -1;
 }
-```
 
-<a id="threesum"></a>
-### 三数之和
-```js
+// ### 三数之和
+
 function threeSum(nums) {
   nums.sort((a, b) => a - b);
   const result = [];
@@ -1552,11 +1316,8 @@ function threeSum(nums) {
   }
   return result;
 }
-```
 
-<a id="trappingrain"></a>
-### 接雨水
-```js
+// ### 接雨水
 function trap(height) {
   let l = 0;
   let r = height.length - 1;
@@ -1576,11 +1337,9 @@ function trap(height) {
   }
   return water;
 }
-```
 
-<a id="diagonaltraverse"></a>
-### 对角线遍历矩阵
-```js
+// ### 对角线遍历矩阵
+
 function diagonalTraverse(matrix) {
   if (matrix.length === 0 || matrix[0].length === 0) return [];
   const rows = matrix.length;
@@ -1616,11 +1375,10 @@ function diagonalTraverse(matrix) {
   }
   return result;
 }
-```
 
-<a id="permute"></a>
-### 全排列
-```js
+
+// ### 全排列
+
 function permuteUnique(nums) {
   const result = [];
 
@@ -1645,11 +1403,10 @@ function permuteUnique(nums) {
   return result;
 }
 
-```
 
-<a id="arraytotree"></a>
-### 数组转树
-```js
+
+// ### 数组转树
+
 function arrayToTree(arr) {
   const map = {};
   const roots = [];
@@ -1673,11 +1430,11 @@ function arrayToTree(arr) {
 
   return roots;
 }
-```
 
-<a id="newpow"></a>
-### Pow（递归 + 快速幂）
-```js
+
+
+// ### Pow（递归 + 快速幂）
+
 function NewPow(x, n) {
   if (n === 0) return 1;
   if (n < 0) return 1 / NewPow(x, -n);
@@ -1687,11 +1444,10 @@ function NewPow(x, n) {
   }
   return x * NewPow(x, n - 1);
 }
-```
 
-<a id="isclosed"></a>
-### 括号闭合
-```js
+
+// ### 括号闭合
+
 function isClosed(str) {
   if (!str) return true;
 
@@ -1713,11 +1469,10 @@ function isClosed(str) {
   }
   return stack.length === 0;
 }
-```
 
-<a id="kmp"></a>
-### KMP 字符串匹配
-```js
+
+// ### KMP 字符串匹配
+
 function kmpSearch(text, pattern) {
   if (pattern === "") return 0;
   const m = pattern.length;
@@ -1744,11 +1499,10 @@ function kmpSearch(text, pattern) {
   }
   return -1;
 }
-```
 
-<a id="topk"></a>
-### 前 K 大（小顶堆）
-```js
+
+// ### 前 K 大（小顶堆）
+
 function heapPush(heap, x) {
   heap.push(x);
   let i = heap.length - 1;
@@ -1785,11 +1539,8 @@ function topKLargest(nums, k) {
   }
   return heap.sort((a, b) => b - a);
 }
-```
+// ### 移动零
 
-<a id="movezeroes"></a>
-### 移动零
-```js
 function moveZeroes(nums) {
   let insert = 0;
   for (let i = 0; i < nums.length; i++) {
@@ -1804,11 +1555,8 @@ function moveZeroes(nums) {
   }
   return nums;
 }
-```
+// ### 盛最多水
 
-<a id="maxarea"></a>
-### 盛最多水
-```js
 function maxArea(height) {
   let left = 0;
   let right = height.length - 1;
@@ -1821,11 +1569,10 @@ function maxArea(height) {
   }
   return best;
 }
-```
 
-<a id="longestcommonprefix"></a>
-### 最长公共前缀
-```js
+
+// ### 最长公共前缀
+
 function longestCommonPrefix(strs) {
   if (!strs || strs.length === 0) return "";
   let prefix = strs[0];
@@ -1837,11 +1584,8 @@ function longestCommonPrefix(strs) {
   }
   return prefix;
 }
-```
 
-<a id="mergesortedarray"></a>
-### 合并两个有序数组
-```js
+// ### 合并两个有序数组
 function mergeSortedArrays(nums1, m, nums2, n) {
   let i = m - 1;
   let j = n - 1;
@@ -1855,11 +1599,9 @@ function mergeSortedArrays(nums1, m, nums2, n) {
   }
   return nums1;
 }
-```
 
-<a id="rotatearray"></a>
-### 旋转数组
-```js
+// ### 旋转数组
+
 function rotateArray(nums, k) {
   const n = nums.length;
   if (n === 0) return nums;
@@ -1877,11 +1619,9 @@ function reverse(arr, i, j) {
     j--;
   }
 }
-```
 
-<a id="maxslidingwindow"></a>
-### 滑动窗口最大值
-```js
+// ### 滑动窗口最大值
+
 function maxSlidingWindow(nums, k) {
   if (k <= 0) return [];
   const deque = [];
@@ -1900,11 +1640,11 @@ function maxSlidingWindow(nums, k) {
   }
   return result;
 }
-```
 
-<a id="groupanagrams"></a>
-### 字母异位词分组
-```js
+
+
+// ### 字母异位词分组
+
 function groupAnagrams(strs) {
   const map = new Map();
   for (const str of strs) {
@@ -1914,11 +1654,10 @@ function groupAnagrams(strs) {
   }
   return Array.from(map.values());
 }
-```
 
-<a id="subarraysum"></a>
-### 和为 K 的子数组
-```js
+
+// ### 和为 K 的子数组
+
 function subarraySum(nums, k) {
   const map = new Map();
   map.set(0, 1);
@@ -1932,11 +1671,10 @@ function subarraySum(nums, k) {
   }
   return count;
 }
-```
 
-<a id="longestconsecutive"></a>
-### 最长连续序列
-```js
+
+
+// ### 最长连续序列
 function longestConsecutive(nums) {
   const set = new Set(nums);
   let best = 0;
@@ -1952,11 +1690,8 @@ function longestConsecutive(nums) {
   }
   return best;
 }
-```
+// ### 除自身以外数组的乘积
 
-<a id="productexceptself"></a>
-### 除自身以外数组的乘积
-```js
 function productExceptSelf(nums) {
   const n = nums.length;
   const res = new Array(n).fill(1);
@@ -1972,11 +1707,11 @@ function productExceptSelf(nums) {
   }
   return res;
 }
-```
 
-<a id="topkfrequent"></a>
-### 前 K 个高频元素
-```js
+
+
+// ### 前 K 个高频元素
+
 function topKFrequent(nums, k) {
   const freq = new Map();
   for (const x of nums) freq.set(x, (freq.get(x) || 0) + 1);
@@ -1995,11 +1730,9 @@ function topKFrequent(nums, k) {
   }
   return result;
 }
-```
 
-<a id="maxprofit"></a>
-### 买卖股票的最佳时机
-```js
+
+// ### 买卖股票的最佳时机
 function maxProfit(prices) {
   let minPrice = Infinity;
   let best = 0;
@@ -2009,11 +1742,8 @@ function maxProfit(prices) {
   }
   return best;
 }
-```
 
-<a id="canjump"></a>
-### 跳跃游戏
-```js
+// ### 跳跃游戏
 function canJump(nums) {
   let farthest = 0;
   for (let i = 0; i < nums.length; i++) {
@@ -2022,11 +1752,8 @@ function canJump(nums) {
   }
   return true;
 }
-```
+// ### 子集
 
-<a id="subsets"></a>
-### 子集
-```js
 function subsets(nums) {
   const result = [];
   const path = [];
@@ -2043,11 +1770,10 @@ function subsets(nums) {
   dfs(0);
   return result;
 }
-```
 
-<a id="combinationsum"></a>
-### 组合总和
-```js
+
+// ### 组合总和
+
 function combinationSum(candidates, target) {
   const result = [];
   const path = [];
@@ -2067,11 +1793,9 @@ function combinationSum(candidates, target) {
   dfs(0, 0);
   return result;
 }
-```
 
-<a id="generateparenthesis"></a>
-### 括号生成
-```js
+// ### 括号生成
+
 function generateParenthesis(n) {
   const res = [];
   function dfs(open, close, str) {
@@ -2085,11 +1809,9 @@ function generateParenthesis(n) {
   dfs(0, 0, "");
   return res;
 }
-```
 
-<a id="dailytemperatures"></a>
-### 每日温度（单调栈）
-```js
+
+// ### 每日温度（单调栈）
 function dailyTemperatures(temperatures) {
   const n = temperatures.length;
   const res = new Array(n).fill(0);
@@ -2106,11 +1828,8 @@ function dailyTemperatures(temperatures) {
   }
   return res;
 }
-```
 
-<a id="largestrectangle"></a>
-### 柱状图中最大的矩形（单调栈）
-```js
+// ### 柱状图中最大的矩形（单调栈）
 function largestRectangleArea(heights) {
   const stack = [];
   let best = 0;
@@ -2126,11 +1845,9 @@ function largestRectangleArea(heights) {
   }
   return best;
 }
-```
 
-<a id="searchinsert"></a>
-### 搜索插入位置
-```js
+// ### 搜索插入位置
+
 function searchInsert(nums, target) {
   let left = 0;
   let right = nums.length;
@@ -2141,11 +1858,9 @@ function searchInsert(nums, target) {
   }
   return left;
 }
-```
 
-<a id="searchrange"></a>
-### 搜索范围（左右边界二分）
-```js
+// ### 搜索范围（左右边界二分）
+
 function lowerBound(nums, target) {
   let left = 0;
   let right = nums.length;
@@ -2174,11 +1889,9 @@ function searchRange(nums, target) {
   if (left <= right && nums[left] === target) return [left, right];
   return [-1, -1];
 }
-```
 
-<a id="findmin"></a>
-### 寻找旋转排序数组中的最小值
-```js
+// ### 寻找旋转排序数组中的最小值
+
 function findMin(nums) {
   let left = 0;
   let right = nums.length - 1;
@@ -2192,15 +1905,14 @@ function findMin(nums) {
   }
   return nums[left];
 }
-```
 
-[⬆ 返回目录](#目录)
 
-## 排序
 
-<a id="quicksort"></a>
-### 快速排序
-```js
+// ## 排序
+
+
+// ### 快速排序
+
 function quickSort(arr) {
   if (arr.length <= 1) return arr;
   const p = Math.floor(arr.length / 2);
@@ -2219,11 +1931,10 @@ function quickSort(arr) {
   }
   return quickSort(left).concat(mid, quickSort(right));
 }
-```
 
-<a id="mergesort"></a>
-### 归并排序
-```js
+
+// ### 归并排序
+
 function mergeSort(arr) {
   if (arr.length <= 1) return arr;
   const mid = Math.floor(arr.length / 2);
@@ -2245,15 +1956,14 @@ function merge(left, right) {
   }
   return result.concat(left.slice(li)).concat(right.slice(ri));
 }
-```
 
-[⬆ 返回目录](#目录)
 
-## 动态规划
 
-<a id="findmoney"></a>
-### 零钱兑换
-```js
+// ## 动态规划
+
+
+// ### 零钱兑换
+
 function findMoney(amount, coins) {
   const dp = new Array(amount + 1).fill(Infinity);
   dp[0] = 0;
@@ -2266,11 +1976,10 @@ function findMoney(amount, coins) {
   }
   return dp[amount] === Infinity ? -1 : dp[amount];
 }
-```
 
-<a id="jumpfloor"></a>
-### 爬楼梯
-```js
+
+// ### 爬楼梯
+
 function jumpFloor1(n) {
   if (n <= 0) return 0;
   if (n === 1) return 1;
@@ -2290,11 +1999,11 @@ function jumpFloor2(n) {
   }
   return dp[n];
 }
-```
 
-<a id="rob1"></a>
-### 打家劫舍
-```js
+
+
+// ### 打家劫舍
+
 function rob1(arr) {
   const n = arr.length;
   if (n === 0) return 0;
@@ -2309,11 +2018,10 @@ function rob1(arr) {
   }
   return dp[n - 1];
 }
-```
 
-<a id="lengthoflis"></a>
-### 最长上升子序列（O(n^2)）
-```js
+
+// ### 最长上升子序列（O(n^2)）
+
 function lengthOfLIS(nums) {
   if (nums.length === 0) return 0;
   const dp = new Array(nums.length).fill(1);
@@ -2328,11 +2036,9 @@ function lengthOfLIS(nums) {
   }
   return res;
 }
-```
 
-<a id="editdistance"></a>
-### 编辑距离
-```js
+// ### 编辑距离
+
 function editDistance(word1, word2) {
   const m = word1.length;
   const n = word2.length;
@@ -2358,11 +2064,8 @@ function editDistance(word1, word2) {
   }
   return dp[m][n];
 }
-```
 
-<a id="maxsubarray"></a>
-### 最大子数组和
-```js
+// ### 最大子数组和
 function maxSubArray(nums) {
   let cur = nums[0];
   let best = nums[0];
@@ -2372,11 +2075,8 @@ function maxSubArray(nums) {
   }
   return best;
 }
-```
 
-<a id="uniquepaths"></a>
-### 不同路径
-```js
+// ### 不同路径
 function uniquePaths(m, n) {
   const dp = new Array(n).fill(1);
   for (let i = 1; i < m; i++) {
@@ -2386,11 +2086,11 @@ function uniquePaths(m, n) {
   }
   return dp[n - 1];
 }
-```
 
-<a id="lcs"></a>
-### 最长公共子序列
-```js
+
+
+// ### 最长公共子序列
+
 function longestCommonSubsequence(text1, text2) {
   const m = text1.length;
   const n = text2.length;
@@ -2408,15 +2108,11 @@ function longestCommonSubsequence(text1, text2) {
   }
   return dp[m][n];
 }
-```
 
-[⬆ 返回目录](#目录)
+// ## 链表
 
-## 链表
+// ### 反转链表
 
-<a id="reverselinkedlist"></a>
-### 反转链表
-```js
 function reverseLinkedList(head) {
   let prev = null;
   let curr = head;
@@ -2428,11 +2124,8 @@ function reverseLinkedList(head) {
   }
   return prev;
 }
-```
 
-<a id="mergetwosortedlists"></a>
-### 合并两个有序链表
-```js
+// ### 合并两个有序链表
 function mergeTwoSortedLists(l1, l2) {
   const dummy = { val: 0, next: null };
   let current = dummy;
@@ -2451,11 +2144,11 @@ function mergeTwoSortedLists(l1, l2) {
   current.next = p1 || p2;
   return dummy.next;
 }
-```
 
-<a id="isbacklist"></a>
-### 回文链表
-```js
+
+
+// ### 回文链表
+
 function isBackList(head) {
   if (!head || !head.next) return true;
 
@@ -2496,11 +2189,9 @@ function reverseNodeList(head) {
   }
   return pre;
 }
-```
 
-<a id="reversekgroup"></a>
-### K 个一组反转链表（补充自 33-answers.js）
-```js
+// ### K 个一组反转链表（补充自 33-answers.js）
+
 class ListNode {
   constructor(val, next = null) {
     this.val = val;
@@ -2532,11 +2223,11 @@ function reverseKGroup(head, k) {
   }
   return dummy.next;
 }
-```
 
-<a id="hascycle"></a>
-### 环形链表
-```js
+
+
+// ### 环形链表
+
 function hasCycle(head) {
   let slow = head;
   let fast = head;
@@ -2547,11 +2238,11 @@ function hasCycle(head) {
   }
   return false;
 }
-```
 
-<a id="removenth"></a>
-### 删除倒数第 N 个节点
-```js
+
+
+// ### 删除倒数第 N 个节点
+
 function removeNthFromEnd(head, n) {
   const dummy = { val: 0, next: head };
   let fast = dummy;
@@ -2566,11 +2257,8 @@ function removeNthFromEnd(head, n) {
   if (slow.next) slow.next = slow.next.next;
   return dummy.next;
 }
-```
+// ### 相交链表
 
-<a id="intersectionnode"></a>
-### 相交链表
-```js
 function getIntersectionNode(headA, headB) {
   let p1 = headA;
   let p2 = headB;
@@ -2580,11 +2268,9 @@ function getIntersectionNode(headA, headB) {
   }
   return p1;
 }
-```
 
-<a id="addtwonumbers"></a>
-### 两数相加
-```js
+// ### 两数相加
+
 function addTwoNumbers(l1, l2) {
   const dummy = { val: 0, next: null };
   let cur = dummy;
@@ -2603,15 +2289,12 @@ function addTwoNumbers(l1, l2) {
   }
   return dummy.next;
 }
-```
 
-[⬆ 返回目录](#目录)
 
-## 树
+// ## 树
 
-<a id="reversetree"></a>
-### 翻转二叉树
-```js
+// ### 翻转二叉树
+
 function reverseTree(root) {
   if (!root) return null;
   const left = reverseTree(root.left);
@@ -2620,11 +2303,11 @@ function reverseTree(root) {
   root.right = left;
   return root;
 }
-```
 
-<a id="traversals"></a>
-### 二叉树遍历（前/中/后/层序）
-```js
+
+
+// ### 二叉树遍历（前/中/后/层序）
+
 function preorderTraversal(root) {
   const result = [];
   function dfs(node) {
@@ -2678,11 +2361,9 @@ function levelOrderTraversal(root) {
   }
   return result;
 }
-```
 
-<a id="lca"></a>
-### 二叉树最近公共祖先
-```js
+// ### 二叉树最近公共祖先
+
 function lowestCommonAncestor(root, p, q) {
   if (!root || root === p || root === q) return root;
   const left = lowestCommonAncestor(root.left, p, q);
@@ -2690,11 +2371,11 @@ function lowestCommonAncestor(root, p, q) {
   if (left && right) return root;
   return left || right;
 }
-```
 
-<a id="objecttraverse"></a>
-### 对象 DFS/BFS、多叉树层序
-```js
+
+
+// ### 对象 DFS/BFS、多叉树层序
+
 function dfsObj1(obj) {
   console.log(obj);
   for (const key in obj) {
@@ -2753,9 +2434,8 @@ function bfsMuchTree(root) {
   return result;
 }
 
-<a id="narynode"></a>
-### 普通树最大深度
-```js
+// ### 普通树最大深度
+
 class NTreeNode {
   constructor(val, children = []) {
     this.val = val;
@@ -2773,11 +2453,10 @@ function naryMaxDepth(root) {
   }
   return max + 1;
 }
-```
 
-<a id="narylevelorder"></a>
-### 普通树层序遍历
-```js
+
+// ### 普通树层序遍历
+
 function naryLevelOrder(root) {
   if (!root) return [];
   const result = [];
@@ -2798,11 +2477,10 @@ function naryLevelOrder(root) {
   }
   return result;
 }
-```
 
-<a id="narytraversal"></a>
-### 普通树前序 / 后序遍历
-```js
+
+// ### 普通树前序 / 后序遍历
+
 function naryPreorder(root) {
   const result = [];
   function dfs(node) {
@@ -2828,11 +2506,9 @@ function naryPostorder(root) {
   dfs(root);
   return result;
 }
-```
 
-<a id="narypathsum"></a>
-### 普通树路径总和
-```js
+// ### 普通树路径总和
+
 function naryPathSum(root, targetSum) {
   const result = [];
   const path = [];
@@ -2851,11 +2527,11 @@ function naryPathSum(root, targetSum) {
   dfs(root, targetSum);
   return result;
 }
-```
 
-<a id="narylca"></a>
-### 普通树最近公共祖先
-```js
+
+
+// ### 普通树最近公共祖先
+
 function naryLowestCommonAncestor(root, p, q) {
   let lca = null;
   function dfs(node) {
@@ -2872,11 +2548,11 @@ function naryLowestCommonAncestor(root, p, q) {
   dfs(root);
   return lca;
 }
-```
 
-<a id="rightview"></a>
-### 二叉树右视图 / 锯齿层序（补充自 33-answers.js）
-```js
+
+
+// ### 二叉树右视图 / 锯齿层序（补充自 33-answers.js）
+
 function rightSideView(root) {
   if (!root) return [];
   const res = [];
@@ -2915,11 +2591,11 @@ function zigzagLevelOrder(root) {
   }
   return res;
 }
-```
 
-<a id="serializetree"></a>
-### 二叉树序列化 / 反序列化（层序，补充自 33-answers.js）
-```js
+
+
+// ### 二叉树序列化 / 反序列化（层序，补充自 33-answers.js）
+
 class TreeNode {
   constructor(val, left = null, right = null) {
     this.val = val;
@@ -2964,20 +2640,17 @@ function deserialize(data) {
   }
   return root;
 }
-```
 
-<a id="maxdepth"></a>
-### 二叉树最大深度
-```js
+
+// ### 二叉树最大深度
+
 function maxDepth(root) {
   if (!root) return 0;
   return Math.max(maxDepth(root.left), maxDepth(root.right)) + 1;
 }
-```
 
-<a id="isvalidbst"></a>
-### 验证二叉搜索树
-```js
+// ### 验证二叉搜索树
+
 function isValidBST(root) {
   function helper(node, min, max) {
     if (!node) return true;
@@ -2986,11 +2659,8 @@ function isValidBST(root) {
   }
   return helper(root, -Infinity, Infinity);
 }
-```
 
-<a id="kthsmallest"></a>
-### 二叉搜索树中第 K 小的元素
-```js
+// ### 二叉搜索树中第 K 小的元素
 function kthSmallest(root, k) {
   const stack = [];
   let cur = root;
@@ -3007,22 +2677,21 @@ function kthSmallest(root, k) {
   }
   return null;
 }
-```
 
-<a id="haspathsum"></a>
-### 路径总和
-```js
+
+// ### 路径总和
+
 function hasPathSum(root, targetSum) {
   if (!root) return false;
   if (!root.left && !root.right) return root.val === targetSum;
   const next = targetSum - root.val;
   return hasPathSum(root.left, next) || hasPathSum(root.right, next);
 }
-```
 
-<a id="pathsumall"></a>
-### 在树里寻找 target 值的路径
-```js
+
+
+// ### 在树里寻找 target 值的路径
+
 function pathSumAll(root, targetSum) {
   const result = [];
   const path = [];
@@ -3041,11 +2710,9 @@ function pathSumAll(root, targetSum) {
   dfs(root, targetSum);
   return result;
 }
-```
 
-<a id="pathsumcount"></a>
-### 在树里寻找 target 值的路径（路径数量）
-```js
+// ### 在树里寻找 target 值的路径（路径数量）
+
 function pathSumCount(root, targetSum) {
   const prefix = new Map();
   prefix.set(0, 1);
@@ -3063,11 +2730,10 @@ function pathSumCount(root, targetSum) {
   dfs(root, 0);
   return count;
 }
-```
 
-<a id="issymmetric"></a>
-### 对称二叉树
-```js
+
+// ### 对称二叉树
+
 function isSymmetric(root) {
   function isMirror(a, b) {
     if (!a && !b) return true;
@@ -3077,11 +2743,9 @@ function isSymmetric(root) {
   }
   return isMirror(root, root);
 }
-```
 
-<a id="isbalanced"></a>
-### 平衡二叉树
-```js
+// ### 平衡二叉树
+
 function isBalanced(root) {
   function height(node) {
     if (!node) return 0;
@@ -3094,11 +2758,10 @@ function isBalanced(root) {
   }
   return height(root) !== -1;
 }
-```
 
-<a id="mindepth"></a>
-### 二叉树最小深度
-```js
+
+// ### 二叉树最小深度
+
 function minDepth(root) {
   if (!root) return 0;
   if (!root.left && !root.right) return 1;
@@ -3106,11 +2769,9 @@ function minDepth(root) {
   if (!root.right) return minDepth(root.left) + 1;
   return Math.min(minDepth(root.left), minDepth(root.right)) + 1;
 }
-```
 
-<a id="diameter"></a>
-### 二叉树直径
-```js
+// ### 二叉树直径
+
 function diameterOfBinaryTree(root) {
   let max = 0;
   function depth(node) {
@@ -3123,11 +2784,11 @@ function diameterOfBinaryTree(root) {
   depth(root);
   return max;
 }
-```
 
-<a id="buildtreeprein"></a>
-### 从前序与中序构建二叉树
-```js
+
+
+// ### 从前序与中序构建二叉树
+
 function buildTreeFromPreIn(preorder, inorder) {
   if (!preorder || preorder.length === 0) return null;
   const indexMap = new Map();
@@ -3146,185 +2807,3 @@ function buildTreeFromPreIn(preorder, inorder) {
   }
   return helper(0, inorder.length - 1);
 }
-```
-
-[⬆ 返回目录](#目录)
-
-## 图 / 并查集
-
-<a id="unionfind"></a>
-### 并查集 + 岛屿数量
-```js
-class UnionFind {
-  constructor(n) {
-    this.parent = Array.from({ length: n }, (_, i) => i);
-    this.rank = new Array(n).fill(0);
-    this.count = n;
-  }
-
-  find(x) {
-    if (this.parent[x] !== x) {
-      this.parent[x] = this.find(this.parent[x]);
-    }
-    return this.parent[x];
-  }
-
-  union(x, y) {
-    const rootX = this.find(x);
-    const rootY = this.find(y);
-    if (rootX === rootY) return;
-    if (this.rank[rootX] < this.rank[rootY]) {
-      this.parent[rootX] = rootY;
-    } else if (this.rank[rootX] > this.rank[rootY]) {
-      this.parent[rootY] = rootX;
-    } else {
-      this.parent[rootY] = rootX;
-      this.rank[rootX]++;
-    }
-    this.count--;
-  }
-}
-
-// grid: '1' / '0'
-<a id="numislands"></a>
-function numIslands(grid) {
-  if (!grid || grid.length === 0) return 0;
-  const rows = grid.length;
-  const cols = grid[0].length;
-  const getIndex = (r, c) => r * cols + c;
-  const uf = new UnionFind(rows * cols);
-  let waterCount = 0;
-
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      if (grid[r][c] === "0") {
-        waterCount++;
-        continue;
-      }
-      if (r + 1 < rows && grid[r + 1][c] === "1") {
-        uf.union(getIndex(r, c), getIndex(r + 1, c));
-      }
-      if (c + 1 < cols && grid[r][c + 1] === "1") {
-        uf.union(getIndex(r, c), getIndex(r, c + 1));
-      }
-    }
-  }
-
-  return uf.count - waterCount;
-}
-
-<a id="canfinish"></a>
-### 课程表（拓扑排序，补充自 33-answers.js）
-```js
-function canFinish(numCourses, prerequisites) {
-  const indeg = new Array(numCourses).fill(0);
-  const g = Array.from({ length: numCourses }, () => []);
-  for (const [a, b] of prerequisites) {
-    g[b].push(a);
-    indeg[a]++;
-  }
-  const q = [];
-  for (let i = 0; i < numCourses; i++) if (indeg[i] === 0) q.push(i);
-  let visited = 0;
-  for (let i = 0; i < q.length; i++) {
-    const u = q[i];
-    visited++;
-    for (const v of g[u]) {
-      if (--indeg[v] === 0) q.push(v);
-    }
-  }
-  return visited === numCourses;
-}
-```
-
-<a id="findorder"></a>
-### 课程表 II（拓扑排序输出）
-```js
-function findOrder(numCourses, prerequisites) {
-  const indeg = new Array(numCourses).fill(0);
-  const g = Array.from({ length: numCourses }, () => []);
-  for (const [a, b] of prerequisites) {
-    g[b].push(a);
-    indeg[a]++;
-  }
-  const queue = [];
-  for (let i = 0; i < numCourses; i++) if (indeg[i] === 0) queue.push(i);
-  const order = [];
-  for (let i = 0; i < queue.length; i++) {
-    const u = queue[i];
-    order.push(u);
-    for (const v of g[u]) {
-      if (--indeg[v] === 0) queue.push(v);
-    }
-  }
-  return order.length === numCourses ? order : [];
-}
-```
-
-<a id="orangesrotting"></a>
-### 腐烂的橘子
-```js
-function orangesRotting(grid) {
-  const rows = grid.length;
-  const cols = grid[0].length;
-  const queue = [];
-  let fresh = 0;
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      if (grid[r][c] === 2) queue.push([r, c]);
-      else if (grid[r][c] === 1) fresh++;
-    }
-  }
-  let minutes = 0;
-  const dirs = [
-    [1, 0],
-    [-1, 0],
-    [0, 1],
-    [0, -1],
-  ];
-  while (queue.length && fresh > 0) {
-    const size = queue.length;
-    for (let i = 0; i < size; i++) {
-      const [r, c] = queue.shift();
-      for (const [dr, dc] of dirs) {
-        const nr = r + dr;
-        const nc = c + dc;
-        if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
-        if (grid[nr][nc] !== 1) continue;
-        grid[nr][nc] = 2;
-        fresh--;
-        queue.push([nr, nc]);
-      }
-    }
-    minutes++;
-  }
-  return fresh === 0 ? minutes : -1;
-}
-```
-
-<a id="provinces"></a>
-### 省份数量
-```js
-function findCircleNum(isConnected) {
-  const n = isConnected.length;
-  const visited = new Array(n).fill(false);
-  let count = 0;
-  function dfs(i) {
-    visited[i] = true;
-    for (let j = 0; j < n; j++) {
-      if (isConnected[i][j] === 1 && !visited[j]) dfs(j);
-    }
-  }
-  for (let i = 0; i < n; i++) {
-    if (!visited[i]) {
-      count++;
-      dfs(i);
-    }
-  }
-  return count;
-}
-```
-
-```
-
-[⬆ 返回目录](#目录)

@@ -2,10 +2,6 @@
 //
 // 工程 / 工具类
 
-const { dir } = require("console");
-const { futimes } = require("fs");
-const { resolve } = require("path");
-
 // - 节流
 function throttle(func, delay) {
   let timer = null;
@@ -170,13 +166,97 @@ function myInstanceof(obj, constructor) {
   return false;
 }
 // - call / apply / bind
+Function.prototype.myCall = function (context, ...args) {
+  context = context ? Object(context) : globalThis;
+  const fn = Symbol("fn");
+  context[fn] = this;
+  const result = context[fn](...args);
+  delete context[fn];
+  return result;
+};
 
+// Function.prototype.myApply=function(context)
+Function.prototype.myBind = function (context, ...args) {
+  const fn = this;
+  return function boundFn(...newArgs) {
+    return fn.call(context, args.concat(newArgs));
+  };
+};
 // - 手写 new
+function myNew(constructor, ...args) {
+  const newObj = Object.create(constructor.prototype);
+  const result = constructor.apply(newObj, args);
+  // return result&&typeof
+}
 // - 柯里化
 // - 柯里化（可变参数）
 // - 函数组合（compose / pipe）
 // - 函数记忆（memoize）
 // - 函数只执行一次（once）
+// - 原型链继承
+function Parent(name) {
+  this.name = name;
+  this.colors = ["red", "black"];
+}
+Parent.prototype.getName = function () {
+  return this.name;
+};
+function Child() {}
+Child.prototype = new Parent("parent");
+Child.prototype.constructor = Child;
+// - 构造函数继承
+function Parent1(name) {
+  this.name = name;
+  this.colors = ["red", "black"];
+}
+function Child1(name, age) {
+  Parent.call(this, name);
+  this.age = age;
+}
+// - 组合继承
+function Parent2(name) {
+  this.name = name;
+  this.colors = ["red", "black"];
+}
+Parent2.prototype.getName = function () {
+  return this.name;
+};
+
+function Child2(name, age) {
+  Parent2.call(this, name);
+  this.age = age;
+}
+Child2.prototype = new Parent("parent");
+Child2.prototype.constructor = Child2;
+// - 原型式继承
+const parent3 = {
+  name: "parent",
+  colors: ["red", "black"],
+};
+const child3 = Object.create(parent3);
+// - 寄生式继承
+function createChild(obj) {
+  const clone = Object.create(obj);
+  clone.sayHi = function () {
+    return "hi";
+  };
+  return clone;
+}
+// - 寄生组合继承
+function Parent4(name) {
+  this.name = name;
+  this.colors = ["red", "balck"];
+}
+Parent4.prototype.getName = function () {
+  return this.name;
+};
+function Child4(name, age) {
+  this.age = age;
+  Parent4.call(this, name);
+}
+Child4.prototype = Object.create(Parent4.prototype);
+Child4.prototype.constructor = Child4;
+// - ES6 class 继承
 // - 深拷贝（处理循环引用）
 //
 // 异步与 Promise 控制
