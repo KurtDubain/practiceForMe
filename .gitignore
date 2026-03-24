@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+
+# Env and secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Node artifacts
+node_modules/
+dist/
+build/
+.cache/
+
+# Local study outputs
+study/.generated/
+study/.state/
+study/openclaw-local/node_modules/
+study/openclaw-runtime/node_modules/

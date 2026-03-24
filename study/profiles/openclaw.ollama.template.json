@@ -1,0 +1,50 @@
+{
+  "env": {
+    "OLLAMA_API_KEY": "ollama-local"
+  },
+  "logging": {
+    "level": "info"
+  },
+  "gateway": {
+    "mode": "local",
+    "bind": "loopback",
+    "port": 18789
+  },
+  "agents": {
+    "defaults": {
+      "workspace": "__WORKSPACE__",
+      "skipBootstrap": true,
+      "model": {
+        "primary": "ollama/gpt-oss:20b",
+        "fallbacks": [
+          "ollama/llama3.3"
+        ]
+      },
+      "thinkingDefault": "high",
+      "timeoutSeconds": 1800,
+      "heartbeat": {
+        "every": "0m"
+      }
+    }
+  },
+  "messages": {
+    "groupChat": {
+      "mentionPatterns": [
+        "@openclaw",
+        "openclaw"
+      ]
+    }
+  },
+  "session": {
+    "scope": "per-sender",
+    "resetTriggers": [
+      "/new",
+      "/reset"
+    ],
+    "reset": {
+      "mode": "daily",
+      "atHour": 4,
+      "idleMinutes": 10080
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "openclaw-runtime",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Pinned local OpenClaw runtime for constrained networks",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "openclaw": "2026.3.13"
+  },
+  "overrides": {
+    "libsignal": "npm:libsignal@2.0.1",
+    "@whiskeysockets/baileys": {
+      "libsignal": "npm:libsignal@2.0.1"
+    }
+  }
+}

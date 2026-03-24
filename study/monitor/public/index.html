@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OpenClaw Monitor</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-left" aria-hidden="true"></div>
+    <div class="bg-orb orb-right" aria-hidden="true"></div>
+
+    <main class="app-shell">
+      <header class="topbar reveal">
+        <div class="title-wrap">
+          <p class="kicker">OpenClaw Process Monitor</p>
+          <h1>Local Lobster Console</h1>
+        </div>
+        <div class="actions">
+          <button id="refreshBtn" class="btn ghost">Refresh</button>
+          <button id="startBtn" class="btn primary">Start Gateway</button>
+          <button id="stopBtn" class="btn danger">Stop Gateway</button>
+          <button id="dashboardBtn" class="btn secondary">Open Dashboard URL</button>
+        </div>
+      </header>
+
+      <section class="status-grid reveal stagger-1">
+        <article class="status-card">
+          <p class="label">Gateway</p>
+          <p id="gatewayState" class="value">Checking...</p>
+          <p id="gatewayHint" class="hint">-</p>
+        </article>
+        <article class="status-card">
+          <p class="label">Model</p>
+          <p id="modelValue" class="value mono">-</p>
+          <p class="hint">Active model from config</p>
+        </article>
+        <article class="status-card">
+          <p class="label">OpenClaw</p>
+          <p id="versionValue" class="value mono">-</p>
+          <p id="configPathValue" class="hint mono">-</p>
+        </article>
+        <article class="status-card">
+          <p class="label">Process Count</p>
+          <p id="processCountValue" class="value">0</p>
+          <p id="lastUpdateValue" class="hint">Updated -</p>
+        </article>
+      </section>
+
+      <section class="panel reveal stagger-2">
+        <div class="panel-head">
+          <h2>OpenClaw Processes</h2>
+          <p id="foregroundPidValue" class="mini-hint">Foreground PID: -</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>PID</th>
+                <th>CPU%</th>
+                <th>MEM%</th>
+                <th>Elapsed</th>
+                <th>Command</th>
+              </tr>
+            </thead>
+            <tbody id="processTableBody">
+              <tr>
+                <td colspan="5" class="empty">No process data yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel split reveal stagger-3">
+        <article>
+          <div class="panel-head">
+            <h2>Gateway Snapshot</h2>
+            <p class="mini-hint">Raw `gateway status` output</p>
+          </div>
+          <pre id="rawStatusPre" class="log-box">Loading...</pre>
+        </article>
+        <article>
+          <div class="panel-head">
+            <h2>Runtime Logs</h2>
+            <div class="tabs">
+              <button class="tab active" data-log="foreground">Foreground</button>
+              <button class="tab" data-log="gateway">Gateway</button>
+              <button class="tab" data-log="stderr">Error</button>
+            </div>
+          </div>
+          <pre id="logPre" class="log-box">Loading...</pre>
+        </article>
+      </section>
+
+      <footer class="footnote reveal stagger-4">
+        <p id="flashMessage">Ready.</p>
+      </footer>
+    </main>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

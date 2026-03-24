@@ -1,0 +1,16 @@
+{
+  "name": "openclaw-local",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Local OpenClaw bootstrap with dependency override for constrained networks",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "openclaw": "2026.3.13"
+  },
+  "overrides": {
+    "libsignal": "2.0.1",
+    "@whiskeysockets/baileys": {
+      "libsignal": "2.0.1"
+    }
+  }
+}
