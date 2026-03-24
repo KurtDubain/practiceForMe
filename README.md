@@ -45,6 +45,7 @@
     - [Promise 的递归调用（顺序执行任务）](#promise-的递归调用顺序执行任务)
     - [Promise 并发限制](#promise-并发限制)
     - [Promise 队列 + 并发控制](#promise-队列--并发控制)
+    - [Task 调度器（add / wait / run）](#task-调度器add--wait--run)
     - [Promise 串行执行器（调用一次执行一次）](#promise-串行执行器调用一次执行一次)
     - [Promise.race 手写](#promiserace-手写)
     - [Promise.allSettled 手写](#promiseallsettled-手写)
@@ -75,8 +76,10 @@
     - [括号闭合](#括号闭合)
     - [KMP 字符串匹配](#kmp-字符串匹配)
     - [前 K 大（小顶堆）](#前-k-大小顶堆)
+    - [前 K 小（大顶堆）](#前-k-小大顶堆)
     - [移动零](#移动零)
     - [盛最多水](#盛最多水)
+    - [矩形重叠面积](#矩形重叠面积)
     - [最长公共前缀](#最长公共前缀)
     - [合并两个有序数组](#合并两个有序数组)
     - [旋转数组](#旋转数组)
@@ -959,6 +962,38 @@ function promiseQueue(tasks, maxConcurrent) {
 }
 ```
 
+<a id="taskscheduler"></a>
+### Task 调度器（add / wait / run）
+```js
+class TaskScheduler {
+  constructor() {
+    this.queue = [];
+  }
+
+  add(task) {
+    this.queue.push(() => Promise.resolve().then(task));
+    return this;
+  }
+
+  wait(ms) {
+    this.queue.push(() => new Promise((resolve) => setTimeout(resolve, ms)));
+    return this;
+  }
+
+  async run() {
+    const queue = this.queue.slice();
+    this.queue.length = 0;
+    const results = [];
+
+    for (const task of queue) {
+      results.push(await task());
+    }
+
+    return results;
+  }
+}
+```
+
 <a id="serialexecutor"></a>
 ### Promise 串行执行器（调用一次执行一次）
 ```js
@@ -1673,6 +1708,62 @@ function arrayToTree(arr) {
 
   return roots;
 }
+
+function arrayToTreeOnePass(arr) {
+  const map = new Map();
+  const roots = [];
+  const rootSet = new Set();
+  const pendingChildren = new Map();
+
+  function addRoot(node) {
+    if (!rootSet.has(node.id)) {
+      rootSet.add(node.id);
+      roots.push(node);
+    }
+  }
+
+  function removeRoot(node) {
+    if (!rootSet.has(node.id)) return;
+    rootSet.delete(node.id);
+    const index = roots.indexOf(node);
+    if (index !== -1) roots.splice(index, 1);
+  }
+
+  for (const item of arr) {
+    const current = map.get(item.id) || { children: [] };
+    Object.assign(current, item);
+    if (!Array.isArray(current.children)) current.children = [];
+    map.set(item.id, current);
+
+    const waiting = pendingChildren.get(item.id);
+    if (waiting) {
+      for (const child of waiting) {
+        if (!current.children.includes(child)) current.children.push(child);
+        removeRoot(child);
+      }
+      pendingChildren.delete(item.id);
+    }
+
+    if (item.parentId === null || item.parentId === undefined) {
+      addRoot(current);
+      continue;
+    }
+
+    const parent = map.get(item.parentId);
+    if (parent) {
+      if (!parent.children.includes(current)) parent.children.push(current);
+      removeRoot(current);
+    } else {
+      if (!pendingChildren.has(item.parentId)) {
+        pendingChildren.set(item.parentId, []);
+      }
+      pendingChildren.get(item.parentId).push(current);
+      addRoot(current);
+    }
+  }
+
+  return roots;
+}
 ```
 
 <a id="newpow"></a>
@@ -1787,6 +1878,50 @@ function topKLargest(nums, k) {
 }
 ```
 
+<a id="topksmallest"></a>
+### 前 K 小（大顶堆）
+```js
+function maxHeapPush(heap, x) {
+  heap.push(x);
+  let i = heap.length - 1;
+  while (i > 0) {
+    const p = (i - 1) >> 1;
+    if (heap[p] >= heap[i]) break;
+    [heap[p], heap[i]] = [heap[i], heap[p]];
+    i = p;
+  }
+}
+
+function maxHeapPop(heap) {
+  if (heap.length === 1) return heap.pop();
+  const top = heap[0];
+  heap[0] = heap.pop();
+  let i = 0;
+  const n = heap.length;
+  while (true) {
+    let largest = i;
+    const l = i * 2 + 1;
+    const r = i * 2 + 2;
+    if (l < n && heap[l] > heap[largest]) largest = l;
+    if (r < n && heap[r] > heap[largest]) largest = r;
+    if (largest === i) break;
+    [heap[i], heap[largest]] = [heap[largest], heap[i]];
+    i = largest;
+  }
+  return top;
+}
+
+function topKSmallest(nums, k) {
+  if (k <= 0) return [];
+  const heap = [];
+  for (const x of nums) {
+    maxHeapPush(heap, x);
+    if (heap.length > k) maxHeapPop(heap);
+  }
+  return heap.sort((a, b) => a - b);
+}
+```
+
 <a id="movezeroes"></a>
 ### 移动零
 ```js
@@ -1820,6 +1955,18 @@ function maxArea(height) {
     else right--;
   }
   return best;
+}
+```
+
+<a id="rectangleoverlap"></a>
+### 矩形重叠面积
+```js
+function rectangleOverlapArea(rect1, rect2) {
+  const left = Math.max(rect1.x, rect2.x);
+  const right = Math.min(rect1.x + rect1.width, rect2.x + rect2.width);
+  const top = Math.max(rect1.y, rect2.y);
+  const bottom = Math.min(rect1.y + rect1.height, rect2.y + rect2.height);
+  return Math.max(0, right - left) * Math.max(0, bottom - top);
 }
 ```
 
