@@ -1,0 +1,41 @@
+{
+  "id": "codex-bridge",
+  "name": "Codex Bridge",
+  "description": "Expose the local Codex CLI as OpenClaw slash commands and top-level CLI commands.",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "repoRoot": {
+        "type": "string"
+      },
+      "codexBin": {
+        "type": "string"
+      },
+      "defaultSandbox": {
+        "type": "string",
+        "enum": [
+          "read-only",
+          "workspace-write",
+          "danger-full-access"
+        ]
+      },
+      "reasoningEffort": {
+        "type": "string",
+        "enum": [
+          "low",
+          "medium",
+          "high"
+        ]
+      },
+      "timeoutMs": {
+        "type": "integer",
+        "minimum": 1000
+      },
+      "maxOutputChars": {
+        "type": "integer",
+        "minimum": 500
+      }
+    }
+  }
+}

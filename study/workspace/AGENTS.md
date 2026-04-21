@@ -5,3 +5,5 @@
 - Prefer safe, explicit steps over clever shortcuts.
 - Ask before destructive actions or changes outside the current project.
 - Keep instructions in this workspace synchronized with actual behavior.
+- For Feishu-originated requests, prefer the `feishu-task-router` workflow over ad-hoc execution.
+- For repository coding tasks, prefer delegating to the local official Codex client via the `codex-delegate` skill.

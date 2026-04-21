@@ -16,13 +16,24 @@ It is designed around the current official OpenClaw docs:
 - `bin/check-prereqs.sh`: checks whether this machine matches the current OpenClaw prerequisites.
 - `bin/render-profile.sh`: renders a repo-local OpenClaw config with the correct workspace path.
 - `bin/openclaw-local.sh`: runs OpenClaw from `study/openclaw-runtime` with local state/config defaults.
+- `bin/openclaw-openai.sh`: runs OpenClaw with the repo-local OpenAI API config and optional `study/.env.openai`.
 - `bin/init-codex-local.sh`: one-command Codex onboarding flow for local-only setup.
+- `bin/openclaw-codex-bridge.sh`: runs OpenClaw with a local plugin that forwards `/codex` directly to your logged-in Codex CLI.
+- `bin/codex-proxy.sh`: starts a local OpenAI-compatible proxy that routes model requests into your logged-in Codex.
+- `bin/openclaw-codex-provider.sh`: runs OpenClaw with `codex-proxy` as the default provider/model backend.
+- `bin/openclaw-stop.sh`: stops the repo-local OpenClaw gateway, monitor, and codex-proxy processes.
+- `bin/codex-study.sh`: runs the official Codex CLI directly in this repo.
+- `bin/codex-desktop.sh`: opens the official Codex desktop app for this repo.
 - `profiles/openclaw.openai.template.json`: OpenAI-backed profile template.
 - `profiles/openclaw.codex.template.json`: Codex subscription profile template for OpenClaw.
+- `profiles/openclaw.codexbridge.template.json`: OpenClaw profile that loads a local Codex bridge plugin.
+- `profiles/openclaw.codexprovider.template.json`: OpenClaw profile that uses the local `codex-proxy` as a normal model provider.
 - `profiles/openclaw.ollama.template.json`: Ollama-backed profile template.
+- `codex-proxy/server.mjs`: local OpenAI-compatible HTTP facade over the Codex CLI.
 - `examples/openai-local-shell-agent.mjs`: a direct local coding assistant using the OpenAI Responses API and the `shell` tool.
 - `openclaw-runtime/package.json`: local pinned runtime install for environments where global npm install is flaky.
 - `monitor/`: standalone visual process dashboard for OpenClaw runtime.
+- `feishu/README.md`: repo-local runbook for OpenClaw + Feishu + Codex-skill routing.
 - `workspace/`: the assistant's repo-local instruction and memory files.
 
 ## Machine snapshot for this workspace
@@ -114,6 +125,20 @@ Render the config:
 export OPENCLAW_CONFIG_PATH="$PWD/study/.generated/openclaw.openai.json"
 ```
 
+If you do not want to export the key every time, copy the local example file:
+
+```bash
+cp study/.env.openai.example study/.env.openai
+```
+
+Then put your real `OPENAI_API_KEY` into `study/.env.openai` and use the wrapper:
+
+```bash
+./study/bin/openclaw-openai.sh models status
+./study/bin/openclaw-openai.sh gateway run --port 18789
+./study/bin/openclaw-openai.sh dashboard
+```
+
 ## Step 3B: Codex subscription route in OpenClaw
 
 Use this if you want to sign in with your ChatGPT/Codex account rather than pay per-token with an API key.
@@ -127,6 +152,91 @@ export OPENCLAW_CONFIG_PATH="$PWD/study/.generated/openclaw.codex.json"
 ```
 
 This profile defaults to `openai-codex/gpt-5.4`, which is the current OpenClaw mapping for Codex OAuth usage.
+
+## Step 3B-2: Codex CLI bridge route in OpenClaw
+
+Use this if:
+
+- your local `codex` CLI is already logged in with ChatGPT
+- OpenClaw's `openai-codex` OAuth path is failing
+- you still want to drive Codex from the OpenClaw GUI
+
+Render the bridge config:
+
+```bash
+./study/bin/render-profile.sh codexbridge
+export OPENCLAW_CONFIG_PATH="$PWD/study/.generated/openclaw.codexbridge.json"
+```
+
+Or use the dedicated wrapper directly:
+
+```bash
+./study/bin/openclaw-codex-bridge.sh gateway run --port 18789
+```
+
+This route does not fix normal OpenClaw chat messages. It adds a plugin command that bypasses the OpenClaw model and calls your local `codex` binary directly.
+
+Available commands:
+
+```text
+/codex status
+/codex read <task>
+/codex write <task>
+/codex danger <task>
+/codex <task>
+```
+
+Examples:
+
+```text
+/codex read 总结当前仓库结构
+/codex write 在 practice/self-test.js 里补齐 parseArr 并解释改动
+```
+
+For shell verification without the GUI:
+
+```bash
+./study/bin/openclaw-codex-bridge.sh codex-status
+./study/bin/openclaw-codex-bridge.sh codex-run "总结这个仓库结构"
+./study/bin/openclaw-codex-bridge.sh codex-run --write "在 README 增加一段 OpenClaw 使用说明"
+```
+
+## Step 3B-3: Codex provider route in OpenClaw
+
+Use this if you want the normal OpenClaw message flow:
+
+- regular Dashboard chat input
+- normal session routing
+- no manual `/codex` prefix
+
+The tradeoff is that the first version is a local proxy layer over Codex. It behaves like a provider, but it does not emit native OpenAI tool calls yet.
+
+Start the local proxy:
+
+```bash
+./study/bin/codex-proxy.sh
+```
+
+In another terminal, render and run the provider config:
+
+```bash
+./study/bin/render-profile.sh codexprovider
+./study/bin/openclaw-codex-provider.sh gateway run --port 18789
+./study/bin/openclaw-codex-provider.sh dashboard
+```
+
+Provider details:
+
+- model ref: `codex-proxy/gpt-5.4`
+- upstream API shape: `openai-completions`
+- local proxy URL: `http://127.0.0.1:18891/v1`
+
+Quick health checks:
+
+```bash
+curl http://127.0.0.1:18891/health
+curl http://127.0.0.1:18891/v1/models
+```
 
 ## Step 3C: Ollama-backed local assistant
 
@@ -213,11 +323,11 @@ OpenAI API path:
 
 ```bash
 ./study/bin/check-prereqs.sh
-./study/bin/render-profile.sh openai
-export OPENAI_API_KEY="your-openai-api-key"
-export OPENCLAW_CONFIG_PATH="$PWD/study/.generated/openclaw.openai.json"
-./study/bin/openclaw-local.sh onboard --install-daemon
-./study/bin/openclaw-local.sh dashboard
+cp study/.env.openai.example study/.env.openai
+# edit study/.env.openai and set OPENAI_API_KEY
+./study/bin/openclaw-openai.sh models status
+./study/bin/openclaw-openai.sh gateway run --port 18789
+./study/bin/openclaw-openai.sh dashboard
 ```
 
 Codex subscription path:
@@ -226,6 +336,32 @@ Codex subscription path:
 ./study/bin/check-prereqs.sh
 ./study/bin/init-codex-local.sh
 ./study/bin/openclaw-local.sh dashboard
+```
+
+Codex CLI bridge path:
+
+```bash
+./study/bin/check-prereqs.sh
+./study/bin/render-profile.sh codexbridge
+./study/bin/openclaw-codex-bridge.sh codex-status
+./study/bin/openclaw-codex-bridge.sh gateway run --port 18789
+./study/bin/openclaw-codex-bridge.sh dashboard
+```
+
+Codex provider path:
+
+```bash
+./study/bin/check-prereqs.sh
+./study/bin/codex-proxy.sh
+./study/bin/render-profile.sh codexprovider
+./study/bin/openclaw-codex-provider.sh gateway run --port 18789
+./study/bin/openclaw-codex-provider.sh dashboard
+```
+
+Stop all repo-local OpenClaw processes:
+
+```bash
+./study/bin/openclaw-stop.sh
 ```
 
 Ollama path:
@@ -310,3 +446,41 @@ Useful environment variables:
 - `OPENAI_MAX_TURNS` default: `8`
 
 This direct route is the cleanest option if your real goal is "local coding assistant with OpenAI brains", not "chat channels + WhatsApp + daemon + routing".
+
+## Membership-only route: use the official Codex client directly
+
+If you only have ChatGPT membership and do not have OpenAI API access, this is the best fit.
+
+Why:
+
+- OpenClaw needs either an API key (`openai`) or its own provider auth flow (`openai-codex`).
+- Your local Codex client can already be logged in with ChatGPT membership.
+- Using the official Codex client avoids the extra OpenClaw auth layer that is currently failing for your account/region path.
+
+Check login status:
+
+```bash
+codex login status
+```
+
+This machine currently reports:
+
+```text
+Logged in using ChatGPT
+```
+
+Repo-local wrappers:
+
+```bash
+./study/bin/codex-study.sh
+./study/bin/codex-study.sh "Summarize this repository structure."
+./study/bin/codex-desktop.sh
+```
+
+Recommended usage:
+
+- Terminal interactive: `./study/bin/codex-study.sh`
+- One-shot task: `./study/bin/codex-study.sh exec "Review practice/self-code.js structure"`
+- Desktop GUI: `./study/bin/codex-desktop.sh`
+
+Use OpenClaw only if you specifically need its gateway/channel model. For pure "local coding assistant + ChatGPT membership", the official Codex client is the simpler route.

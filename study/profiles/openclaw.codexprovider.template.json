@@ -1,0 +1,73 @@
+{
+  "logging": {
+    "level": "info"
+  },
+  "gateway": {
+    "mode": "local",
+    "bind": "loopback",
+    "port": 18789
+  },
+  "agents": {
+    "defaults": {
+      "workspace": "__WORKSPACE__",
+      "skipBootstrap": true,
+      "model": {
+        "primary": "codex-proxy/gpt-5.4"
+      },
+      "thinkingDefault": "medium",
+      "timeoutSeconds": 1800,
+      "heartbeat": {
+        "every": "0m"
+      }
+    }
+  },
+  "messages": {
+    "groupChat": {
+      "mentionPatterns": [
+        "@openclaw",
+        "openclaw"
+      ]
+    }
+  },
+  "session": {
+    "scope": "per-sender",
+    "resetTriggers": [
+      "/new",
+      "/reset"
+    ],
+    "reset": {
+      "mode": "daily",
+      "atHour": 4,
+      "idleMinutes": 10080
+    }
+  },
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "codex-proxy": {
+        "baseUrl": "http://127.0.0.1:18891/v1",
+        "apiKey": "codex-local",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "gpt-5.4",
+            "name": "Codex Proxy GPT-5.4",
+            "reasoning": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 200000,
+            "maxTokens": 32000
+          }
+        ]
+      }
+    }
+  }
+}
